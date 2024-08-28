@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText } from "lucide-react";
+import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText, Database, Lock } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const [alertCount, setAlertCount] = useState(5);
   const [systemStatus, setSystemStatus] = useState('Operational');
   const [investigationCount, setInvestigationCount] = useState(3);
+  const [systemLoad, setSystemLoad] = useState(65);
 
   const handleViewAlerts = () => {
     alert(`Viewing ${alertCount} active alerts`);
@@ -49,6 +51,8 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold text-green-500">{systemStatus}</p>
+            <Progress value={systemLoad} className="mt-2" />
+            <p className="text-sm text-gray-500 mt-1">System Load: {systemLoad}%</p>
             <Button className="mt-4 bg-green-500 hover:bg-green-600">
               <Activity className="mr-2 h-4 w-4" />
               View Details
@@ -89,9 +93,17 @@ const Index = () => {
                 User Management
               </Button>
             </Link>
-            <Button className="w-full" variant="outline">
+            <Button className="w-full mb-2" variant="outline">
               <Shield className="mr-2 h-4 w-4" />
               Security Settings
+            </Button>
+            <Button className="w-full mb-2" variant="outline">
+              <Database className="mr-2 h-4 w-4" />
+              Data Vault Access
+            </Button>
+            <Button className="w-full" variant="outline">
+              <Lock className="mr-2 h-4 w-4" />
+              Encryption Management
             </Button>
           </CardContent>
         </Card>
@@ -113,6 +125,7 @@ const Index = () => {
               <li>System update completed - 3 hours ago</li>
               <li>New alert detected - 5 hours ago</li>
               <li>User verification completed - 1 day ago</li>
+              <li>Blockchain sync completed - 1 day ago</li>
             </ul>
           </CardContent>
         </Card>
