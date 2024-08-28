@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText, Database, Lock } from "lucide-react";
 import { Link } from 'react-router-dom';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import { Progress } from "../components/ui/progress";
+import { useToast } from "../components/ui/use-toast";
 
 const Index = () => {
   const { toast } = useToast();
@@ -138,20 +138,20 @@ const Index = () => {
               Configure System
             </Button>
             <Link to="/admin" className="w-full">
-              <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline">
+              <Button className="w-full mb-2 bg-secondary text-white" variant="secondary">
                 <Users className="mr-2 h-4 w-4" />
                 User Management
               </Button>
             </Link>
-            <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline" onClick={handleSecuritySettings}>
+            <Button className="w-full mb-2 bg-secondary text-white" variant="secondary" onClick={handleSecuritySettings}>
               <Shield className="mr-2 h-4 w-4" />
               Security Settings
             </Button>
-            <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline" onClick={handleDataVaultAccess}>
+            <Button className="w-full mb-2 bg-secondary text-white" variant="secondary" onClick={handleDataVaultAccess}>
               <Database className="mr-2 h-4 w-4" />
               Data Vault Access
             </Button>
-            <Button className="w-full bg-secondary text-secondary-foreground" variant="outline" onClick={handleEncryptionManagement}>
+            <Button className="w-full bg-secondary text-white" variant="secondary" onClick={handleEncryptionManagement}>
               <Lock className="mr-2 h-4 w-4" />
               Encryption Management
             </Button>
