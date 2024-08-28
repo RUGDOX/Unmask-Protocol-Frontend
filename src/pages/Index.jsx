@@ -5,9 +5,10 @@ import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText, Databas
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const { toast } = useToast();
   const [alertCount, setAlertCount] = useState(5);
   const [systemStatus, setSystemStatus] = useState('Operational');
   const [investigationCount, setInvestigationCount] = useState(3);
