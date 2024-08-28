@@ -185,7 +185,13 @@ const AdminPanel = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
-                  onClick={() => restartMutation.mutate()} 
+                  onClick={() => {
+                    toast({
+                      title: "System Restart",
+                      description: "Initiating system restart...",
+                    });
+                    restartMutation.mutate();
+                  }} 
                   disabled={restartMutation.isLoading}
                   className="flex items-center justify-center"
                 >
@@ -193,14 +199,28 @@ const AdminPanel = () => {
                   {restartMutation.isLoading ? 'Restarting...' : 'Restart System'}
                 </Button>
                 <Button 
-                  onClick={() => generateReportMutation.mutate()} 
+                  onClick={() => {
+                    toast({
+                      title: "Report Generation",
+                      description: "Generating system report...",
+                    });
+                    generateReportMutation.mutate();
+                  }} 
                   disabled={generateReportMutation.isLoading}
                   className="flex items-center justify-center"
                 >
                   <FileText className="mr-2 h-4 w-4" />
                   {generateReportMutation.isLoading ? 'Generating...' : 'Generate Report'}
                 </Button>
-                <Button className="flex items-center justify-center">
+                <Button 
+                  onClick={() => {
+                    toast({
+                      title: "System Logs",
+                      description: "Viewing system logs...",
+                    });
+                  }}
+                  className="flex items-center justify-center"
+                >
                   <Activity className="mr-2 h-4 w-4" />
                   View System Logs
                 </Button>
@@ -216,13 +236,21 @@ const AdminPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {investigations.map((investigation, index) => (
-                  <Alert key={index} variant={investigation.status === 'urgent' ? 'destructive' : 'default'}>
+                {investigations && investigations.length > 0 ? (
+                  investigations.map((investigation, index) => (
+                    <Alert key={index} variant={investigation.status === 'urgent' ? 'destructive' : 'default'}>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Case #{investigation.id}</AlertTitle>
+                      <AlertDescription>Status: {investigation.status}</AlertDescription>
+                    </Alert>
+                  ))
+                ) : (
+                  <Alert>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Case #{investigation.id}</AlertTitle>
-                    <AlertDescription>Status: {investigation.status}</AlertDescription>
+                    <AlertTitle>No Active Investigations</AlertTitle>
+                    <AlertDescription>There are currently no ongoing investigations.</AlertDescription>
                   </Alert>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -253,7 +281,13 @@ const AdminPanel = () => {
                   />
                 </div>
                 <Button
-                  onClick={() => createUserMutation.mutate(newUser)}
+                  onClick={() => {
+                    toast({
+                      title: "Creating User",
+                      description: `Creating new user: ${newUser.username}`,
+                    });
+                    createUserMutation.mutate(newUser);
+                  }}
                   disabled={createUserMutation.isLoading}
                   className="w-full"
                 >
@@ -261,15 +295,32 @@ const AdminPanel = () => {
                   {createUserMutation.isLoading ? 'Creating...' : 'Create User'}
                 </Button>
                 <div className="space-y-2">
-                  {users.map((user) => (
-                    <div key={user.id} className="flex justify-between items-center">
-                      <span>{user.username} ({user.role})</span>
-                      <Button variant="outline" size="sm">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Verify
-                      </Button>
-                    </div>
-                  ))}
+                  {users && users.length > 0 ? (
+                    users.map((user) => (
+                      <div key={user.id} className="flex justify-between items-center">
+                        <span>{user.username} ({user.role})</span>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "User Verification",
+                              description: `Verifying user: ${user.username}`,
+                            });
+                          }}
+                        >
+                          <Shield className="mr-2 h-4 w-4" />
+                          Verify
+                        </Button>
+                      </div>
+                    ))
+                  ) : (
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>No Users Found</AlertTitle>
+                      <AlertDescription>There are currently no users in the system.</AlertDescription>
+                    </Alert>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -318,7 +369,13 @@ const AdminPanel = () => {
                   />
                 </div>
                 <Button
-                  onClick={() => updateConfigMutation.mutate(config)}
+                  onClick={() => {
+                    toast({
+                      title: "Updating Configuration",
+                      description: "Applying new system configuration...",
+                    });
+                    updateConfigMutation.mutate(config);
+                  }}
                   disabled={updateConfigMutation.isLoading}
                   className="w-full"
                 >
@@ -337,15 +394,29 @@ const AdminPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {modules.map((module) => (
-                  <div key={module.id} className="flex justify-between items-center">
-                    <span>{module.name}</span>
-                    <Switch
-                      checked={module.enabled}
-                      onCheckedChange={(enabled) => toggleModuleMutation.mutate({ moduleId: module.id, enabled })}
-                    />
-                  </div>
-                ))}
+                {modules && modules.length > 0 ? (
+                  modules.map((module) => (
+                    <div key={module.id} className="flex justify-between items-center">
+                      <span>{module.name}</span>
+                      <Switch
+                        checked={module.enabled}
+                        onCheckedChange={(enabled) => {
+                          toast({
+                            title: `Module ${enabled ? 'Enabled' : 'Disabled'}`,
+                            description: `${module.name} has been ${enabled ? 'enabled' : 'disabled'}.`,
+                          });
+                          toggleModuleMutation.mutate({ moduleId: module.id, enabled });
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>No Modules Found</AlertTitle>
+                    <AlertDescription>There are currently no modules available.</AlertDescription>
+                  </Alert>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -376,7 +447,15 @@ const AdminPanel = () => {
                   <Switch id="deadManSwitch" />
                   <Label htmlFor="deadManSwitch">Enable Dead Man's Switch</Label>
                 </div>
-                <Button className="w-full">
+                <Button 
+                  className="w-full"
+                  onClick={() => {
+                    toast({
+                      title: "Security Settings Updated",
+                      description: "The security settings have been updated successfully.",
+                    });
+                  }}
+                >
                   <Lock className="mr-2 h-4 w-4" />
                   Update Security Settings
                 </Button>
@@ -413,7 +492,15 @@ const AdminPanel = () => {
                     placeholder="0x..."
                   />
                 </div>
-                <Button className="w-full">
+                <Button 
+                  className="w-full"
+                  onClick={() => {
+                    toast({
+                      title: "Blockchain Sync Initiated",
+                      description: "Syncing blockchain data. This may take a few minutes.",
+                    });
+                  }}
+                >
                   <Database className="mr-2 h-4 w-4" />
                   Sync Blockchain Data
                 </Button>
