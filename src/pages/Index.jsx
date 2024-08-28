@@ -85,7 +85,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold text-red-500">{alertCount}</p>
-            <Button className="mt-4 bg-red-500 hover:bg-red-600" onClick={handleViewAlerts}>
+            <Button className="mt-4 bg-red-500 hover:bg-red-600 text-white" onClick={handleViewAlerts}>
               <Bell className="mr-2 h-4 w-4" />
               View Alerts
             </Button>
@@ -103,7 +103,7 @@ const Index = () => {
             <p className="text-2xl font-semibold text-green-500">{systemStatus}</p>
             <Progress value={systemLoad} className="mt-2" />
             <p className="text-sm text-gray-500 mt-1">System Load: {systemLoad}%</p>
-            <Button className="mt-4 bg-green-500 hover:bg-green-600" onClick={handleViewDetails}>
+            <Button className="mt-4 bg-green-500 hover:bg-green-600 text-white" onClick={handleViewDetails}>
               <Activity className="mr-2 h-4 w-4" />
               View Details
             </Button>
@@ -119,7 +119,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold text-blue-500">{investigationCount}</p>
-            <Button className="mt-4 bg-blue-500 hover:bg-blue-600" onClick={handleViewInvestigations}>
+            <Button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white" onClick={handleViewInvestigations}>
               <FileText className="mr-2 h-4 w-4" />
               View Investigations
             </Button>
@@ -133,25 +133,25 @@ const Index = () => {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button className="w-full mb-2" onClick={handleConfigureSystem}>
+            <Button className="w-full mb-2 bg-primary text-white" onClick={handleConfigureSystem}>
               <Settings className="mr-2 h-4 w-4" />
               Configure System
             </Button>
             <Link to="/admin" className="w-full">
-              <Button className="w-full mb-2" variant="outline">
+              <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline">
                 <Users className="mr-2 h-4 w-4" />
                 User Management
               </Button>
             </Link>
-            <Button className="w-full mb-2" variant="outline" onClick={handleSecuritySettings}>
+            <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline" onClick={handleSecuritySettings}>
               <Shield className="mr-2 h-4 w-4" />
               Security Settings
             </Button>
-            <Button className="w-full mb-2" variant="outline" onClick={handleDataVaultAccess}>
+            <Button className="w-full mb-2 bg-secondary text-secondary-foreground" variant="outline" onClick={handleDataVaultAccess}>
               <Database className="mr-2 h-4 w-4" />
               Data Vault Access
             </Button>
-            <Button className="w-full" variant="outline" onClick={handleEncryptionManagement}>
+            <Button className="w-full bg-secondary text-secondary-foreground" variant="outline" onClick={handleEncryptionManagement}>
               <Lock className="mr-2 h-4 w-4" />
               Encryption Management
             </Button>
