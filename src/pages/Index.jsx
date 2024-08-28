@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText, Database, Lock } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

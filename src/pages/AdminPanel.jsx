@@ -1,15 +1,15 @@
 import React from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
 import { AlertCircle, RefreshCw, Settings, FileText, Users, Shield, Package, Lock, Database, Activity } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Switch } from "../components/ui/switch";
+import { Textarea } from "../components/ui/textarea";
+import { useToast } from "../components/ui/use-toast";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
