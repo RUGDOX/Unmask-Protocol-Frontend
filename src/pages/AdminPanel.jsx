@@ -9,75 +9,120 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 // API functions
+const handleApiError = (error) => {
+  console.error('API Error:', error);
+  throw new Error(error.message || 'An error occurred while fetching data');
+};
+
 const fetchAlerts = async () => {
-  const response = await fetch('/api/alerts');
-  if (!response.ok) throw new Error('Failed to fetch alerts');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/alerts`);
+    if (!response.ok) throw new Error('Failed to fetch alerts');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const restartSystem = async () => {
-  const response = await fetch('/api/restart', { method: 'POST' });
-  if (!response.ok) throw new Error('Failed to restart system');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/restart`, { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to restart system');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const updateConfig = async (config) => {
-  const response = await fetch('/api/update-config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(config),
-  });
-  if (!response.ok) throw new Error('Failed to update configuration');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/update-config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    });
+    if (!response.ok) throw new Error('Failed to update configuration');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const generateReport = async () => {
-  const response = await fetch('/api/generate-report', { method: 'POST' });
-  if (!response.ok) throw new Error('Failed to generate report');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/generate-report`, { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to generate report');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const fetchUsers = async () => {
-  const response = await fetch('/api/users');
-  if (!response.ok) throw new Error('Failed to fetch users');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/users`);
+    if (!response.ok) throw new Error('Failed to fetch users');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const createUser = async (userData) => {
-  const response = await fetch('/api/users', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userData),
-  });
-  if (!response.ok) throw new Error('Failed to create user');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) throw new Error('Failed to create user');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const fetchModules = async () => {
-  const response = await fetch('/api/modules');
-  if (!response.ok) throw new Error('Failed to fetch modules');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/modules`);
+    if (!response.ok) throw new Error('Failed to fetch modules');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const toggleModule = async ({ moduleId, enabled }) => {
-  const response = await fetch(`/api/modules/${moduleId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ enabled }),
-  });
-  if (!response.ok) throw new Error('Failed to toggle module');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled }),
+    });
+    if (!response.ok) throw new Error('Failed to toggle module');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const fetchInvestigations = async () => {
-  const response = await fetch('/api/investigations');
-  if (!response.ok) throw new Error('Failed to fetch investigations');
-  return response.json();
+  try {
+    const response = await fetch(`${API_BASE_URL}/investigations`);
+    if (!response.ok) throw new Error('Failed to fetch investigations');
+    return response.json();
+  } catch (error) {
+    return handleApiError(error);
+  }
 };
 
 const AdminPanel = () => {
+  const { toast } = useToast();
   const { data: alerts, isLoading: alertsLoading, error: alertsError } = useQuery({
     queryKey: ['alerts'],
     queryFn: fetchAlerts,
