@@ -2,93 +2,78 @@ import React from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw, Settings, FileText, Users, Shield, Package } from "lucide-react";
+import { AlertCircle, RefreshCw, Settings, FileText, Users, Shield, Package, Lock, Database, Activity } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
-// These functions would call your backend API
+// API functions
 const fetchAlerts = async () => {
   const response = await fetch('/api/alerts');
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
+  if (!response.ok) throw new Error('Failed to fetch alerts');
   return response.json();
 };
 
 const restartSystem = async () => {
   const response = await fetch('/api/restart', { method: 'POST' });
-  if (!response.ok) {
-    throw new Error('Failed to restart system');
-  }
+  if (!response.ok) throw new Error('Failed to restart system');
   return response.json();
 };
 
 const updateConfig = async (config) => {
   const response = await fetch('/api/update-config', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(config),
   });
-  if (!response.ok) {
-    throw new Error('Failed to update configuration');
-  }
+  if (!response.ok) throw new Error('Failed to update configuration');
   return response.json();
 };
 
 const generateReport = async () => {
   const response = await fetch('/api/generate-report', { method: 'POST' });
-  if (!response.ok) {
-    throw new Error('Failed to generate report');
-  }
+  if (!response.ok) throw new Error('Failed to generate report');
   return response.json();
 };
 
 const fetchUsers = async () => {
   const response = await fetch('/api/users');
-  if (!response.ok) {
-    throw new Error('Failed to fetch users');
-  }
+  if (!response.ok) throw new Error('Failed to fetch users');
   return response.json();
 };
 
 const createUser = async (userData) => {
   const response = await fetch('/api/users', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData),
   });
-  if (!response.ok) {
-    throw new Error('Failed to create user');
-  }
+  if (!response.ok) throw new Error('Failed to create user');
   return response.json();
 };
 
 const fetchModules = async () => {
   const response = await fetch('/api/modules');
-  if (!response.ok) {
-    throw new Error('Failed to fetch modules');
-  }
+  if (!response.ok) throw new Error('Failed to fetch modules');
   return response.json();
 };
 
 const toggleModule = async ({ moduleId, enabled }) => {
   const response = await fetch(`/api/modules/${moduleId}`, {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
   });
-  if (!response.ok) {
-    throw new Error('Failed to toggle module');
-  }
+  if (!response.ok) throw new Error('Failed to toggle module');
+  return response.json();
+};
+
+const fetchInvestigations = async () => {
+  const response = await fetch('/api/investigations');
+  if (!response.ok) throw new Error('Failed to fetch investigations');
   return response.json();
 };
 
@@ -108,6 +93,11 @@ const AdminPanel = () => {
     queryFn: fetchModules,
   });
 
+  const { data: investigations, isLoading: investigationsLoading, error: investigationsError } = useQuery({
+    queryKey: ['investigations'],
+    queryFn: fetchInvestigations,
+  });
+
   const restartMutation = useMutation({ mutationFn: restartSystem });
   const updateConfigMutation = useMutation({ mutationFn: updateConfig });
   const generateReportMutation = useMutation({ mutationFn: generateReport });
@@ -119,27 +109,33 @@ const AdminPanel = () => {
     encryptionKey: '',
     idVerificationService: '',
     blockchainEndpoint: '',
+    oasisSapphireEndpoint: '',
   });
 
-  if (alertsLoading || usersLoading || modulesLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  if (alertsError || usersError || modulesError) return <div className="flex justify-center items-center h-screen">Error: {alertsError?.message || usersError?.message || modulesError?.message}</div>;
+  if (alertsLoading || usersLoading || modulesLoading || investigationsLoading) 
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (alertsError || usersError || modulesError || investigationsError) 
+    return <div className="flex justify-center items-center h-screen">Error: {alertsError?.message || usersError?.message || modulesError?.message || investigationsError?.message}</div>;
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Unmask Protocol Admin Panel</h1>
       
-      <Tabs defaultValue="controls" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="controls">System Controls</TabsTrigger>
-          <TabsTrigger value="alerts">Recent Alerts</TabsTrigger>
+      <Tabs defaultValue="dashboard" className="w-full">
+        <TabsList className="grid w-full grid-cols-7">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="investigations">Investigations</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="modules">Module Management</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="blockchain">Blockchain</TabsTrigger>
         </TabsList>
-        <TabsContent value="controls">
+
+        <TabsContent value="dashboard">
           <Card>
             <CardHeader>
-              <CardTitle>System Controls</CardTitle>
+              <CardTitle>System Overview</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -152,14 +148,6 @@ const AdminPanel = () => {
                   {restartMutation.isLoading ? 'Restarting...' : 'Restart System'}
                 </Button>
                 <Button 
-                  onClick={() => updateConfigMutation.mutate(config)} 
-                  disabled={updateConfigMutation.isLoading}
-                  className="flex items-center justify-center"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  {updateConfigMutation.isLoading ? 'Updating...' : 'Update Configuration'}
-                </Button>
-                <Button 
                   onClick={() => generateReportMutation.mutate()} 
                   disabled={generateReportMutation.isLoading}
                   className="flex items-center justify-center"
@@ -167,28 +155,34 @@ const AdminPanel = () => {
                   <FileText className="mr-2 h-4 w-4" />
                   {generateReportMutation.isLoading ? 'Generating...' : 'Generate Report'}
                 </Button>
+                <Button className="flex items-center justify-center">
+                  <Activity className="mr-2 h-4 w-4" />
+                  View System Logs
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="alerts">
+
+        <TabsContent value="investigations">
           <Card>
             <CardHeader>
-              <CardTitle>Recent Alerts</CardTitle>
+              <CardTitle>Active Investigations</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {alerts.map((alert, index) => (
-                  <Alert key={index} variant={alert.severity}>
+                {investigations.map((investigation, index) => (
+                  <Alert key={index} variant={investigation.status === 'urgent' ? 'destructive' : 'default'}>
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>{alert.title}</AlertTitle>
-                    <AlertDescription>{alert.message}</AlertDescription>
+                    <AlertTitle>Case #{investigation.id}</AlertTitle>
+                    <AlertDescription>Status: {investigation.status}</AlertDescription>
                   </Alert>
                 ))}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="users">
           <Card>
             <CardHeader>
@@ -236,10 +230,11 @@ const AdminPanel = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="settings">
           <Card>
             <CardHeader>
-              <CardTitle>Settings Management</CardTitle>
+              <CardTitle>System Configuration</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -262,11 +257,19 @@ const AdminPanel = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="blockchainEndpoint">Blockchain Endpoint</Label>
+                  <Label htmlFor="blockchainEndpoint">Ethereum Blockchain Endpoint</Label>
                   <Input
                     id="blockchainEndpoint"
                     value={config.blockchainEndpoint}
                     onChange={(e) => setConfig({ ...config, blockchainEndpoint: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="oasisSapphireEndpoint">Oasis Sapphire Endpoint</Label>
+                  <Input
+                    id="oasisSapphireEndpoint"
+                    value={config.oasisSapphireEndpoint}
+                    onChange={(e) => setConfig({ ...config, oasisSapphireEndpoint: e.target.value })}
                   />
                 </div>
                 <Button
@@ -281,6 +284,7 @@ const AdminPanel = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
         <TabsContent value="modules">
           <Card>
             <CardHeader>
@@ -297,6 +301,77 @@ const AdminPanel = () => {
                     />
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security">
+          <Card>
+            <CardHeader>
+              <CardTitle>Security Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="encryptionAlgorithm">Encryption Algorithm</Label>
+                  <Input
+                    id="encryptionAlgorithm"
+                    placeholder="e.g., AES-256"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dataVaultAccess">Data Vault Access Policy</Label>
+                  <Textarea
+                    id="dataVaultAccess"
+                    placeholder="Define access policy for data vaults"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch id="deadManSwitch" />
+                  <Label htmlFor="deadManSwitch">Enable Dead Man's Switch</Label>
+                </div>
+                <Button className="w-full">
+                  <Lock className="mr-2 h-4 w-4" />
+                  Update Security Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="blockchain">
+          <Card>
+            <CardHeader>
+              <CardTitle>Blockchain Integration</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="ethereumNode">Ethereum Node URL</Label>
+                  <Input
+                    id="ethereumNode"
+                    placeholder="https://mainnet.infura.io/v3/YOUR-PROJECT-ID"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="oasisSapphireNode">Oasis Sapphire Node URL</Label>
+                  <Input
+                    id="oasisSapphireNode"
+                    placeholder="https://sapphire.oasis.io"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="smartContractAddress">Smart Contract Address</Label>
+                  <Input
+                    id="smartContractAddress"
+                    placeholder="0x..."
+                  />
+                </div>
+                <Button className="w-full">
+                  <Database className="mr-2 h-4 w-4" />
+                  Sync Blockchain Data
+                </Button>
               </div>
             </CardContent>
           </Card>
