@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { AlertCircle, RefreshCw, Settings, FileText, Users, Shield, Package, Lock, Database, Activity } from "lucide-react";
@@ -10,161 +10,194 @@ import { Label } from "../components/ui/label";
 import { Switch } from "../components/ui/switch";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../components/ui/use-toast";
+import { Link } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+// Mock data for development
+const mockAlerts = [
+  { id: 1, title: 'Security Breach Attempt', status: 'urgent' },
+  { id: 2, title: 'System Update Required', status: 'normal' },
+  { id: 3, title: 'Unusual Login Pattern', status: 'warning' }
+];
 
-// API functions
-const handleApiError = (error) => {
-  console.error('API Error:', error);
-  throw new Error(error.message || 'An error occurred while fetching data');
-};
+const mockUsers = [
+  { id: 1, username: 'admin', email: 'admin@unmask.io', role: 'Administrator' },
+  { id: 2, username: 'investigator1', email: 'inv1@unmask.io', role: 'Investigator' },
+  { id: 3, username: 'analyst', email: 'analyst@unmask.io', role: 'Data Analyst' }
+];
 
-const fetchAlerts = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/alerts`);
-    if (!response.ok) throw new Error('Failed to fetch alerts');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
+const mockModules = [
+  { id: 1, name: 'ID Verification Engine', enabled: true },
+  { id: 2, name: 'Blockchain Connector', enabled: true },
+  { id: 3, name: 'Investigation Toolkit', enabled: false },
+  { id: 4, name: 'Data Encryption Service', enabled: true }
+];
 
-const restartSystem = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/restart`, { method: 'POST' });
-    if (!response.ok) throw new Error('Failed to restart system');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const updateConfig = async (config) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/update-config`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(config),
-    });
-    if (!response.ok) throw new Error('Failed to update configuration');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const generateReport = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/generate-report`, { method: 'POST' });
-    if (!response.ok) throw new Error('Failed to generate report');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const fetchUsers = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users`);
-    if (!response.ok) throw new Error('Failed to fetch users');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const createUser = async (userData) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
-    if (!response.ok) throw new Error('Failed to create user');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const fetchModules = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/modules`);
-    if (!response.ok) throw new Error('Failed to fetch modules');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const toggleModule = async ({ moduleId, enabled }) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ enabled }),
-    });
-    if (!response.ok) throw new Error('Failed to toggle module');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
-
-const fetchInvestigations = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/investigations`);
-    if (!response.ok) throw new Error('Failed to fetch investigations');
-    return response.json();
-  } catch (error) {
-    return handleApiError(error);
-  }
-};
+const mockInvestigations = [
+  { id: 'INV-2023-001', title: 'Cross-Chain Fund Tracing', status: 'active' },
+  { id: 'INV-2023-002', title: 'Identity Verification Review', status: 'urgent' },
+  { id: 'INV-2023-003', title: 'Compliance Check', status: 'pending' }
+];
 
 const AdminPanel = () => {
   const { toast } = useToast();
-  const { data: alerts, isLoading: alertsLoading, error: alertsError } = useQuery({
-    queryKey: ['alerts'],
-    queryFn: fetchAlerts,
+  const [alerts, setAlerts] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [investigations, setInvestigations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [newUser, setNewUser] = useState({ username: '', email: '', role: '' });
+  const [config, setConfig] = useState({
+    encryptionKey: 'aes-256-gcm-standard',
+    idVerificationService: 'https://verify.unmask.io',
+    blockchainEndpoint: 'https://eth.unmask.io',
+    oasisSapphireEndpoint: 'https://sapphire.unmask.io',
   });
 
-  const { data: users, isLoading: usersLoading, error: usersError } = useQuery({
-    queryKey: ['users'],
-    queryFn: fetchUsers,
-  });
+  // Load mock data on component mount
+  useEffect(() => {
+    const loadMockData = async () => {
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setAlerts(mockAlerts);
+        setUsers(mockUsers);
+        setModules(mockModules);
+        setInvestigations(mockInvestigations);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load data');
+        setLoading(false);
+      }
+    };
 
-  const { data: modules, isLoading: modulesLoading, error: modulesError } = useQuery({
-    queryKey: ['modules'],
-    queryFn: fetchModules,
-  });
+    loadMockData();
+  }, []);
 
-  const { data: investigations, isLoading: investigationsLoading, error: investigationsError } = useQuery({
-    queryKey: ['investigations'],
-    queryFn: fetchInvestigations,
-  });
+  // User management functions
+  const handleCreateUser = () => {
+    if (!newUser.username || !newUser.email || !newUser.role) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all user fields",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const restartMutation = useMutation({ mutationFn: restartSystem });
-  const updateConfigMutation = useMutation({ mutationFn: updateConfig });
-  const generateReportMutation = useMutation({ mutationFn: generateReport });
-  const createUserMutation = useMutation({ mutationFn: createUser });
-  const toggleModuleMutation = useMutation({ mutationFn: toggleModule });
+    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+    const userToAdd = { ...newUser, id: newId };
+    
+    setUsers([...users, userToAdd]);
+    setNewUser({ username: '', email: '', role: '' });
+    
+    toast({
+      title: "User Created",
+      description: `User ${newUser.username} has been created successfully.`,
+    });
+  };
 
-  const [newUser, setNewUser] = React.useState({ username: '', email: '', role: '' });
-  const [config, setConfig] = React.useState({
-    encryptionKey: '',
-    idVerificationService: '',
-    blockchainEndpoint: '',
-    oasisSapphireEndpoint: '',
-  });
+  const handleVerifyUser = (username) => {
+    toast({
+      title: "User Verification",
+      description: `Verifying user: ${username}`,
+    });
+  };
 
-  if (alertsLoading || usersLoading || modulesLoading || investigationsLoading) 
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  if (alertsError || usersError || modulesError || investigationsError) 
-    return <div className="flex justify-center items-center h-screen">Error: {alertsError?.message || usersError?.message || modulesError?.message || investigationsError?.message}</div>;
+  // System management functions
+  const handleRestartSystem = () => {
+    toast({
+      title: "System Restart",
+      description: "Initiating system restart...",
+    });
+    
+    setTimeout(() => {
+      toast({
+        title: "System Restarted",
+        description: "System has been restarted successfully.",
+      });
+    }, 2000);
+  };
+
+  const handleGenerateReport = () => {
+    toast({
+      title: "Report Generation",
+      description: "Generating system report...",
+    });
+    
+    setTimeout(() => {
+      toast({
+        title: "Report Generated",
+        description: "System report has been generated successfully.",
+      });
+    }, 1500);
+  };
+
+  const handleViewLogs = () => {
+    toast({
+      title: "System Logs",
+      description: "Viewing system logs...",
+    });
+  };
+
+  // Module management functions
+  const handleToggleModule = (moduleId, enabled) => {
+    setModules(modules.map(module => 
+      module.id === moduleId ? { ...module, enabled } : module
+    ));
+    
+    const module = modules.find(m => m.id === moduleId);
+    toast({
+      title: `Module ${enabled ? 'Enabled' : 'Disabled'}`,
+      description: `${module.name} has been ${enabled ? 'enabled' : 'disabled'}.`,
+    });
+  };
+
+  // Settings functions
+  const handleUpdateConfig = () => {
+    toast({
+      title: "Configuration Updated",
+      description: "System configuration has been updated successfully.",
+    });
+  };
+
+  // Security functions
+  const handleSecuritySettings = () => {
+    toast({
+      title: "Security Settings Updated",
+      description: "The security settings have been updated successfully.",
+    });
+  };
+
+  // Blockchain functions
+  const handleSyncBlockchain = () => {
+    toast({
+      title: "Blockchain Sync Initiated",
+      description: "Syncing blockchain data. This may take a few minutes.",
+    });
+    
+    setTimeout(() => {
+      toast({
+        title: "Blockchain Sync Complete",
+        description: "Blockchain data has been synchronized successfully.",
+      });
+    }, 3000);
+  };
+
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (error) return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Unmask Protocol Admin Panel</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Unmask Protocol Admin Panel</h1>
+        <Link to="/">
+          <Button variant="outline">
+            Return to Dashboard
+          </Button>
+        </Link>
+      </div>
       
       <Tabs defaultValue="dashboard" className="w-full">
         <TabsList className="grid w-full grid-cols-7">
@@ -185,40 +218,21 @@ const AdminPanel = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
-                  onClick={() => {
-                    toast({
-                      title: "System Restart",
-                      description: "Initiating system restart...",
-                    });
-                    restartMutation.mutate();
-                  }} 
-                  disabled={restartMutation.isLoading}
+                  onClick={handleRestartSystem}
                   className="flex items-center justify-center"
                 >
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  {restartMutation.isLoading ? 'Restarting...' : 'Restart System'}
+                  Restart System
                 </Button>
                 <Button 
-                  onClick={() => {
-                    toast({
-                      title: "Report Generation",
-                      description: "Generating system report...",
-                    });
-                    generateReportMutation.mutate();
-                  }} 
-                  disabled={generateReportMutation.isLoading}
+                  onClick={handleGenerateReport}
                   className="flex items-center justify-center"
                 >
                   <FileText className="mr-2 h-4 w-4" />
-                  {generateReportMutation.isLoading ? 'Generating...' : 'Generate Report'}
+                  Generate Report
                 </Button>
                 <Button 
-                  onClick={() => {
-                    toast({
-                      title: "System Logs",
-                      description: "Viewing system logs...",
-                    });
-                  }}
+                  onClick={handleViewLogs}
                   className="flex items-center justify-center"
                 >
                   <Activity className="mr-2 h-4 w-4" />
@@ -281,33 +295,24 @@ const AdminPanel = () => {
                   />
                 </div>
                 <Button
-                  onClick={() => {
-                    toast({
-                      title: "Creating User",
-                      description: `Creating new user: ${newUser.username}`,
-                    });
-                    createUserMutation.mutate(newUser);
-                  }}
-                  disabled={createUserMutation.isLoading}
+                  onClick={handleCreateUser}
                   className="w-full"
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  {createUserMutation.isLoading ? 'Creating...' : 'Create User'}
+                  Create User
                 </Button>
                 <div className="space-y-2">
                   {users && users.length > 0 ? (
                     users.map((user) => (
-                      <div key={user.id} className="flex justify-between items-center">
-                        <span>{user.username} ({user.role})</span>
+                      <div key={user.id} className="flex justify-between items-center border p-3 rounded">
+                        <div>
+                          <div className="font-semibold">{user.username}</div>
+                          <div className="text-sm text-gray-500">{user.email} - {user.role}</div>
+                        </div>
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "User Verification",
-                              description: `Verifying user: ${user.username}`,
-                            });
-                          }}
+                          onClick={() => handleVerifyUser(user.username)}
                         >
                           <Shield className="mr-2 h-4 w-4" />
                           Verify
@@ -369,18 +374,11 @@ const AdminPanel = () => {
                   />
                 </div>
                 <Button
-                  onClick={() => {
-                    toast({
-                      title: "Updating Configuration",
-                      description: "Applying new system configuration...",
-                    });
-                    updateConfigMutation.mutate(config);
-                  }}
-                  disabled={updateConfigMutation.isLoading}
+                  onClick={handleUpdateConfig}
                   className="w-full"
                 >
                   <Settings className="mr-2 h-4 w-4" />
-                  {updateConfigMutation.isLoading ? 'Updating...' : 'Update Settings'}
+                  Update Settings
                 </Button>
               </div>
             </CardContent>
@@ -396,17 +394,11 @@ const AdminPanel = () => {
               <div className="space-y-4">
                 {modules && modules.length > 0 ? (
                   modules.map((module) => (
-                    <div key={module.id} className="flex justify-between items-center">
+                    <div key={module.id} className="flex justify-between items-center border p-3 rounded">
                       <span>{module.name}</span>
                       <Switch
                         checked={module.enabled}
-                        onCheckedChange={(enabled) => {
-                          toast({
-                            title: `Module ${enabled ? 'Enabled' : 'Disabled'}`,
-                            description: `${module.name} has been ${enabled ? 'enabled' : 'disabled'}.`,
-                          });
-                          toggleModuleMutation.mutate({ moduleId: module.id, enabled });
-                        }}
+                        onCheckedChange={(enabled) => handleToggleModule(module.id, enabled)}
                       />
                     </div>
                   ))
@@ -434,6 +426,7 @@ const AdminPanel = () => {
                   <Input
                     id="encryptionAlgorithm"
                     placeholder="e.g., AES-256"
+                    defaultValue="AES-256-GCM"
                   />
                 </div>
                 <div className="space-y-2">
@@ -441,20 +434,16 @@ const AdminPanel = () => {
                   <Textarea
                     id="dataVaultAccess"
                     placeholder="Define access policy for data vaults"
+                    defaultValue="Only admin users can access level 3 data. Investigators can access level 1-2 data with proper authorization."
                   />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Switch id="deadManSwitch" />
+                  <Switch id="deadManSwitch" defaultChecked={true} />
                   <Label htmlFor="deadManSwitch">Enable Dead Man's Switch</Label>
                 </div>
                 <Button 
                   className="w-full"
-                  onClick={() => {
-                    toast({
-                      title: "Security Settings Updated",
-                      description: "The security settings have been updated successfully.",
-                    });
-                  }}
+                  onClick={handleSecuritySettings}
                 >
                   <Lock className="mr-2 h-4 w-4" />
                   Update Security Settings
@@ -475,31 +464,26 @@ const AdminPanel = () => {
                   <Label htmlFor="ethereumNode">Ethereum Node URL</Label>
                   <Input
                     id="ethereumNode"
-                    placeholder="https://mainnet.infura.io/v3/YOUR-PROJECT-ID"
+                    defaultValue="https://mainnet.infura.io/v3/your-project-id"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="oasisSapphireNode">Oasis Sapphire Node URL</Label>
                   <Input
                     id="oasisSapphireNode"
-                    placeholder="https://sapphire.oasis.io"
+                    defaultValue="https://sapphire.oasis.io"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="smartContractAddress">Smart Contract Address</Label>
                   <Input
                     id="smartContractAddress"
-                    placeholder="0x..."
+                    defaultValue="0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
                   />
                 </div>
                 <Button 
                   className="w-full"
-                  onClick={() => {
-                    toast({
-                      title: "Blockchain Sync Initiated",
-                      description: "Syncing blockchain data. This may take a few minutes.",
-                    });
-                  }}
+                  onClick={handleSyncBlockchain}
                 >
                   <Database className="mr-2 h-4 w-4" />
                   Sync Blockchain Data
