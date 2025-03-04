@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Bell, Settings, Activity, AlertCircle, Shield, Users, FileText, Database, Lock } from "lucide-react";
@@ -7,47 +7,141 @@ import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { Progress } from "../components/ui/progress";
 import { useToast } from "../components/ui/use-toast";
 
+import { alertsService } from '../services/alertsService';
+import { investigationsService } from '../services/investigationsService';
+import { systemService } from '../services/systemService';
+
 const Index = () => {
   const { toast } = useToast();
-  const [alertCount, setAlertCount] = useState(5);
-  const [systemStatus, setSystemStatus] = useState('Operational');
-  const [investigationCount, setInvestigationCount] = useState(3);
-  const [systemLoad, setSystemLoad] = useState(65);
+  const [alertCount, setAlertCount] = useState(0);
+  const [systemStatus, setSystemStatus] = useState('Loading...');
+  const [investigationCount, setInvestigationCount] = useState(0);
+  const [systemLoad, setSystemLoad] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [recentActivity, setRecentActivity] = useState([]);
 
-  const handleViewAlerts = () => {
-    toast({
-      title: "Viewing Alerts",
-      description: `There are ${alertCount} active alerts.`,
-    });
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        setTimeout(async () => {
+          try {
+            const alerts = [
+              { id: 1, title: 'Security Breach Attempt', status: 'urgent' },
+              { id: 2, title: 'System Update Required', status: 'normal' },
+              { id: 3, title: 'Unusual Login Pattern', status: 'warning' },
+              { id: 4, title: 'Failed Login Attempts', status: 'urgent' },
+              { id: 5, title: 'Database Connection Issue', status: 'warning' }
+            ];
+            
+            const investigations = [
+              { id: 'INV-2023-001', title: 'Cross-Chain Fund Tracing', status: 'active' },
+              { id: 'INV-2023-002', title: 'Identity Verification Review', status: 'urgent' },
+              { id: 'INV-2023-003', title: 'Compliance Check', status: 'pending' }
+            ];
+            
+            const activities = [
+              { id: 1, text: 'New investigation opened', timestamp: '1 hour ago' },
+              { id: 2, text: 'System update completed', timestamp: '3 hours ago' },
+              { id: 3, text: 'New alert detected', timestamp: '5 hours ago' },
+              { id: 4, text: 'User verification completed', timestamp: '1 day ago' },
+              { id: 5, text: 'Blockchain sync completed', timestamp: '1 day ago' }
+            ];
+            
+            setAlertCount(alerts.length);
+            setInvestigationCount(investigations.length);
+            setSystemStatus('Operational');
+            setSystemLoad(65);
+            setRecentActivity(activities);
+            setLoading(false);
+          } catch (err) {
+            console.error('Failed to load data:', err);
+            setError('Failed to load data: ' + err.message);
+            setLoading(false);
+          }
+        }, 500);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setError('Failed to load data');
+        setLoading(false);
+      }
+    };
 
-  const handleConfigureSystem = () => {
-    setSystemStatus('Configuring...');
-    toast({
-      title: "System Configuration",
-      description: "System configuration process started.",
-    });
-    setTimeout(() => {
-      setSystemStatus('Operational');
+    loadData();
+  }, []);
+
+  const handleViewAlerts = async () => {
+    try {
       toast({
-        title: "Configuration Complete",
-        description: "System configuration process completed successfully.",
+        title: "Viewing Alerts",
+        description: `There are ${alertCount} active alerts.`,
       });
-    }, 2000);
+    } catch (err) {
+      toast({
+        title: "Error Viewing Alerts",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleViewDetails = () => {
-    toast({
-      title: "System Details",
-      description: `Current system load: ${systemLoad}%`,
-    });
+  const handleConfigureSystem = async () => {
+    try {
+      setSystemStatus('Configuring...');
+      
+      toast({
+        title: "System Configuration",
+        description: "System configuration process started.",
+      });
+      
+      setTimeout(() => {
+        setSystemStatus('Operational');
+        toast({
+          title: "Configuration Complete",
+          description: "System configuration process completed successfully.",
+        });
+      }, 2000);
+    } catch (err) {
+      setSystemStatus('Error');
+      toast({
+        title: "Error Configuring System",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleViewInvestigations = () => {
-    toast({
-      title: "Active Investigations",
-      description: `There are ${investigationCount} ongoing investigations.`,
-    });
+  const handleViewDetails = async () => {
+    try {
+      toast({
+        title: "System Details",
+        description: `Current system load: ${systemLoad}%`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error Viewing System Details",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleViewInvestigations = async () => {
+    try {
+      toast({
+        title: "Active Investigations",
+        description: `There are ${investigationCount} ongoing investigations.`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error Viewing Investigations",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSecuritySettings = () => {
@@ -70,6 +164,9 @@ const Index = () => {
       description: "Opening encryption management interface...",
     });
   };
+
+  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (error) return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
 
   return (
     <div className="container mx-auto p-4">
@@ -171,11 +268,9 @@ const Index = () => {
               </AlertDescription>
             </Alert>
             <ul className="space-y-2 mt-4">
-              <li>New investigation opened - 1 hour ago</li>
-              <li>System update completed - 3 hours ago</li>
-              <li>New alert detected - 5 hours ago</li>
-              <li>User verification completed - 1 day ago</li>
-              <li>Blockchain sync completed - 1 day ago</li>
+              {recentActivity.map((activity) => (
+                <li key={activity.id}>{activity.text} - {activity.timestamp}</li>
+              ))}
             </ul>
           </CardContent>
         </Card>

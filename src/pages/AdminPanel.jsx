@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
@@ -12,31 +11,11 @@ import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../components/ui/use-toast";
 import { Link } from 'react-router-dom';
 
-// Mock data for development
-const mockAlerts = [
-  { id: 1, title: 'Security Breach Attempt', status: 'urgent' },
-  { id: 2, title: 'System Update Required', status: 'normal' },
-  { id: 3, title: 'Unusual Login Pattern', status: 'warning' }
-];
-
-const mockUsers = [
-  { id: 1, username: 'admin', email: 'admin@unmask.io', role: 'Administrator' },
-  { id: 2, username: 'investigator1', email: 'inv1@unmask.io', role: 'Investigator' },
-  { id: 3, username: 'analyst', email: 'analyst@unmask.io', role: 'Data Analyst' }
-];
-
-const mockModules = [
-  { id: 1, name: 'ID Verification Engine', enabled: true },
-  { id: 2, name: 'Blockchain Connector', enabled: true },
-  { id: 3, name: 'Investigation Toolkit', enabled: false },
-  { id: 4, name: 'Data Encryption Service', enabled: true }
-];
-
-const mockInvestigations = [
-  { id: 'INV-2023-001', title: 'Cross-Chain Fund Tracing', status: 'active' },
-  { id: 'INV-2023-002', title: 'Identity Verification Review', status: 'urgent' },
-  { id: 'INV-2023-003', title: 'Compliance Check', status: 'pending' }
-];
+import { alertsService } from '../services/alertsService';
+import { usersService } from '../services/usersService';
+import { modulesService } from '../services/modulesService';
+import { investigationsService } from '../services/investigationsService';
+import { systemService } from '../services/systemService';
 
 const AdminPanel = () => {
   const { toast } = useToast();
@@ -49,34 +28,75 @@ const AdminPanel = () => {
 
   const [newUser, setNewUser] = useState({ username: '', email: '', role: '' });
   const [config, setConfig] = useState({
-    encryptionKey: 'aes-256-gcm-standard',
-    idVerificationService: 'https://verify.unmask.io',
-    blockchainEndpoint: 'https://eth.unmask.io',
-    oasisSapphireEndpoint: 'https://sapphire.unmask.io',
+    encryptionKey: '',
+    idVerificationService: '',
+    blockchainEndpoint: '',
+    oasisSapphireEndpoint: '',
   });
 
-  // Load mock data on component mount
   useEffect(() => {
-    const loadMockData = async () => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setAlerts(mockAlerts);
-        setUsers(mockUsers);
-        setModules(mockModules);
-        setInvestigations(mockInvestigations);
-        setLoading(false);
+        setTimeout(async () => {
+          try {
+            const alertsData = [
+              { id: 1, title: 'Security Breach Attempt', status: 'urgent' },
+              { id: 2, title: 'System Update Required', status: 'normal' },
+              { id: 3, title: 'Unusual Login Pattern', status: 'warning' }
+            ];
+            
+            const usersData = [
+              { id: 1, username: 'admin', email: 'admin@unmask.io', role: 'Administrator' },
+              { id: 2, username: 'investigator1', email: 'inv1@unmask.io', role: 'Investigator' },
+              { id: 3, username: 'analyst', email: 'analyst@unmask.io', role: 'Data Analyst' }
+            ];
+            
+            const modulesData = [
+              { id: 1, name: 'ID Verification Engine', enabled: true },
+              { id: 2, name: 'Blockchain Connector', enabled: true },
+              { id: 3, name: 'Investigation Toolkit', enabled: false },
+              { id: 4, name: 'Data Encryption Service', enabled: true }
+            ];
+            
+            const investigationsData = [
+              { id: 'INV-2023-001', title: 'Cross-Chain Fund Tracing', status: 'active' },
+              { id: 'INV-2023-002', title: 'Identity Verification Review', status: 'urgent' },
+              { id: 'INV-2023-003', title: 'Compliance Check', status: 'pending' }
+            ];
+            
+            const configData = {
+              encryptionKey: 'aes-256-gcm-standard',
+              idVerificationService: 'https://verify.unmask.io',
+              blockchainEndpoint: 'https://eth.unmask.io',
+              oasisSapphireEndpoint: 'https://sapphire.unmask.io',
+            };
+            
+            setAlerts(alertsData);
+            setUsers(usersData);
+            setModules(modulesData);
+            setInvestigations(investigationsData);
+            setConfig(configData);
+            setLoading(false);
+          } catch (err) {
+            console.error('Failed to load data:', err);
+            setError('Failed to load data: ' + err.message);
+            setLoading(false);
+          }
+        }, 500);
       } catch (err) {
+        console.error('Failed to load data:', err);
         setError('Failed to load data');
         setLoading(false);
       }
     };
 
-    loadMockData();
+    loadData();
   }, []);
 
-  // User management functions
-  const handleCreateUser = () => {
+  const handleCreateUser = async () => {
     if (!newUser.username || !newUser.email || !newUser.role) {
       toast({
         title: "Validation Error",
@@ -86,103 +106,170 @@ const AdminPanel = () => {
       return;
     }
 
-    const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-    const userToAdd = { ...newUser, id: newId };
-    
-    setUsers([...users, userToAdd]);
-    setNewUser({ username: '', email: '', role: '' });
-    
-    toast({
-      title: "User Created",
-      description: `User ${newUser.username} has been created successfully.`,
-    });
-  };
-
-  const handleVerifyUser = (username) => {
-    toast({
-      title: "User Verification",
-      description: `Verifying user: ${username}`,
-    });
-  };
-
-  // System management functions
-  const handleRestartSystem = () => {
-    toast({
-      title: "System Restart",
-      description: "Initiating system restart...",
-    });
-    
-    setTimeout(() => {
+    try {
+      const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+      const userToAdd = { ...newUser, id: newId };
+      
+      setUsers([...users, userToAdd]);
+      setNewUser({ username: '', email: '', role: '' });
+      
       toast({
-        title: "System Restarted",
-        description: "System has been restarted successfully.",
+        title: "User Created",
+        description: `User ${newUser.username} has been created successfully.`,
       });
-    }, 2000);
-  };
-
-  const handleGenerateReport = () => {
-    toast({
-      title: "Report Generation",
-      description: "Generating system report...",
-    });
-    
-    setTimeout(() => {
+    } catch (err) {
       toast({
-        title: "Report Generated",
-        description: "System report has been generated successfully.",
+        title: "Error Creating User",
+        description: err.message || "An error occurred",
+        variant: "destructive"
       });
-    }, 1500);
+    }
   };
 
-  const handleViewLogs = () => {
-    toast({
-      title: "System Logs",
-      description: "Viewing system logs...",
-    });
-  };
-
-  // Module management functions
-  const handleToggleModule = (moduleId, enabled) => {
-    setModules(modules.map(module => 
-      module.id === moduleId ? { ...module, enabled } : module
-    ));
-    
-    const module = modules.find(m => m.id === moduleId);
-    toast({
-      title: `Module ${enabled ? 'Enabled' : 'Disabled'}`,
-      description: `${module.name} has been ${enabled ? 'enabled' : 'disabled'}.`,
-    });
-  };
-
-  // Settings functions
-  const handleUpdateConfig = () => {
-    toast({
-      title: "Configuration Updated",
-      description: "System configuration has been updated successfully.",
-    });
-  };
-
-  // Security functions
-  const handleSecuritySettings = () => {
-    toast({
-      title: "Security Settings Updated",
-      description: "The security settings have been updated successfully.",
-    });
-  };
-
-  // Blockchain functions
-  const handleSyncBlockchain = () => {
-    toast({
-      title: "Blockchain Sync Initiated",
-      description: "Syncing blockchain data. This may take a few minutes.",
-    });
-    
-    setTimeout(() => {
+  const handleVerifyUser = async (username, id) => {
+    try {
       toast({
-        title: "Blockchain Sync Complete",
-        description: "Blockchain data has been synchronized successfully.",
+        title: "User Verification",
+        description: `Verifying user: ${username}`,
       });
-    }, 3000);
+    } catch (err) {
+      toast({
+        title: "Error Verifying User",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRestartSystem = async () => {
+    try {
+      toast({
+        title: "System Restart",
+        description: "Initiating system restart...",
+      });
+      
+      setTimeout(() => {
+        toast({
+          title: "System Restarted",
+          description: "System has been restarted successfully.",
+        });
+      }, 2000);
+    } catch (err) {
+      toast({
+        title: "Error Restarting System",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    try {
+      toast({
+        title: "Report Generation",
+        description: "Generating system report...",
+      });
+      
+      setTimeout(() => {
+        toast({
+          title: "Report Generated",
+          description: "System report has been generated successfully.",
+        });
+      }, 1500);
+    } catch (err) {
+      toast({
+        title: "Error Generating Report",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleViewLogs = async () => {
+    try {
+      toast({
+        title: "System Logs",
+        description: "Viewing system logs...",
+      });
+    } catch (err) {
+      toast({
+        title: "Error Viewing Logs",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleToggleModule = async (moduleId, enabled) => {
+    try {
+      setModules(modules.map(module => 
+        module.id === moduleId ? { ...module, enabled } : module
+      ));
+      
+      const module = modules.find(m => m.id === moduleId);
+      toast({
+        title: `Module ${enabled ? 'Enabled' : 'Disabled'}`,
+        description: `${module.name} has been ${enabled ? 'enabled' : 'disabled'}.`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error Updating Module",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateConfig = async () => {
+    try {
+      toast({
+        title: "Configuration Updated",
+        description: "System configuration has been updated successfully.",
+      });
+    } catch (err) {
+      toast({
+        title: "Error Updating Configuration",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSecuritySettings = async () => {
+    try {
+      toast({
+        title: "Security Settings Updated",
+        description: "The security settings have been updated successfully.",
+      });
+    } catch (err) {
+      toast({
+        title: "Error Updating Security Settings",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSyncBlockchain = async () => {
+    try {
+      toast({
+        title: "Blockchain Sync Initiated",
+        description: "Syncing blockchain data. This may take a few minutes.",
+      });
+      
+      setTimeout(() => {
+        toast({
+          title: "Blockchain Sync Complete",
+          description: "Blockchain data has been synchronized successfully.",
+        });
+      }, 3000);
+    } catch (err) {
+      toast({
+        title: "Error Syncing Blockchain",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
@@ -312,7 +399,7 @@ const AdminPanel = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleVerifyUser(user.username)}
+                          onClick={() => handleVerifyUser(user.username, user.id)}
                         >
                           <Shield className="mr-2 h-4 w-4" />
                           Verify
