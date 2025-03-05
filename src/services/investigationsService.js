@@ -21,4 +21,16 @@ export const investigationsService = {
    * Update investigation status
    */
   updateInvestigationStatus: (id, status) => put(`/investigations/${id}`, { status }),
+  
+  /**
+   * Create investigation from a report
+   */
+  createInvestigationFromReport: (reportId, investigationData) => 
+    post(`/investigations/from-report/${reportId}`, investigationData),
+  
+  /**
+   * Get reports linked to an investigation
+   */
+  getLinkedReports: (investigationId) => 
+    get(`/investigations/${investigationId}/reports`),
 };

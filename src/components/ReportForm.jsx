@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { AlertTriangle, Send, Shield } from "lucide-react";
+import { AlertTriangle, Send, Shield, FileText } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -19,6 +19,8 @@ const ReportForm = () => {
     description: "",
     evidenceLinks: "",
     reporterEmail: "",
+    rugId: "", // Added field to identify specific project by ID
+    associatedProjects: "", // Added field to connect to other known projects
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,24 +41,27 @@ const ReportForm = () => {
     
     try {
       // In a real implementation, this would call the API
-      // await reportsService.submitReport(formData);
+      await reportsService.submitReport(formData);
       
-      // For demo purposes, simulate a successful submission
-      setTimeout(() => {
-        toast.success("Report submitted successfully");
-        setFormData({
-          projectName: "",
-          websiteUrl: "",
-          walletAddresses: "",
-          description: "",
-          evidenceLinks: "",
-          reporterEmail: "",
-        });
-        setIsSubmitting(false);
-      }, 1000);
+      toast.success("Report submitted successfully", {
+        description: "Your report will be reviewed by our investigation team."
+      });
+      setFormData({
+        projectName: "",
+        websiteUrl: "",
+        walletAddresses: "",
+        description: "",
+        evidenceLinks: "",
+        reporterEmail: "",
+        rugId: "",
+        associatedProjects: "",
+      });
     } catch (error) {
       console.error("Error submitting report:", error);
-      toast.error("Failed to submit report");
+      toast.error("Failed to submit report", {
+        description: "Please try again later or contact support."
+      });
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -89,6 +94,20 @@ const ReportForm = () => {
           </div>
           
           <div className="space-y-2">
+            <Label htmlFor="rugId">Project Identifier (if known)</Label>
+            <Input
+              id="rugId"
+              name="rugId" 
+              value={formData.rugId}
+              onChange={handleChange}
+              placeholder="Unique identifier for this project (e.g., contract address, ENS, etc.)"
+            />
+            <p className="text-xs text-muted-foreground">
+              If you know the project's unique identifier, please provide it to help us link related reports
+            </p>
+          </div>
+          
+          <div className="space-y-2">
             <Label htmlFor="websiteUrl">Website URL</Label>
             <Input
               id="websiteUrl"
@@ -109,6 +128,18 @@ const ReportForm = () => {
               onChange={handleChange}
               placeholder="List any wallet addresses connected to this scam (one per line)"
               rows={3}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="associatedProjects">Known Associated Projects</Label>
+            <Textarea
+              id="associatedProjects"
+              name="associatedProjects"
+              value={formData.associatedProjects}
+              onChange={handleChange}
+              placeholder="List any other projects or entities you believe are connected to this scam"
+              rows={2}
             />
           </div>
           

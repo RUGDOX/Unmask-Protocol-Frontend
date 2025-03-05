@@ -10,6 +10,7 @@ import { Switch } from "../components/ui/switch";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../components/ui/use-toast";
 import { Link } from 'react-router-dom';
+import ReportsList from "../components/ReportsList";
 
 import { alertsService } from '../services/alertsService';
 import { usersService } from '../services/usersService';
@@ -33,6 +34,8 @@ const AdminPanel = () => {
     blockchainEndpoint: '',
     oasisSapphireEndpoint: '',
   });
+
+  const [reportsTabRefreshTrigger, setReportsTabRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -272,6 +275,13 @@ const AdminPanel = () => {
     }
   };
 
+  const handleInvestigationCreated = () => {
+    toast({
+      title: "Investigation Created",
+      description: "A new investigation has been added to the system.",
+    });
+  };
+
   if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
   if (error) return <div className="flex justify-center items-center h-screen">Error: {error}</div>;
 
@@ -287,8 +297,9 @@ const AdminPanel = () => {
       </div>
       
       <Tabs defaultValue="dashboard" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="investigations">Investigations</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -326,6 +337,20 @@ const AdminPanel = () => {
                   View System Logs
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reports">
+          <Card>
+            <CardHeader>
+              <CardTitle>Scam Reports</CardTitle>
+              <CardDescription>
+                Review and process incoming scam reports from the community
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReportsList onInvestigationCreated={handleInvestigationCreated} />
             </CardContent>
           </Card>
         </TabsContent>
