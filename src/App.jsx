@@ -1,28 +1,23 @@
 
-import React from "react";
-import { Toaster } from "./components/ui/sonner";
-import { TooltipProvider } from "./components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import AdminPanel from "./pages/AdminPanel";
-import ReportingPage from "./pages/ReportingPage";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import AdminPanel from './pages/AdminPanel';
+import ReportingPage from './pages/ReportingPage';
+import ProjectRegistrationPage from './pages/ProjectRegistrationPage';
+import { Toaster } from './components/ui/sonner';
 
-const queryClient = new QueryClient();
-
-const App = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/report" element={<ReportingPage />} />
-        </Routes>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/report" element={<ReportingPage />} />
+        <Route path="/register" element={<ProjectRegistrationPage />} />
+      </Routes>
+      <Toaster />
+    </Router>
   );
-};
+}
 
 export default App;

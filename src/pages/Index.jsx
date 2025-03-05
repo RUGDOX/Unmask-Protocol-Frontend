@@ -1,103 +1,83 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Shield, AlertTriangle, User, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Shield, AlertTriangle, BadgeCheck } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 
 const Index = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold tracking-tight">Unmask Protocol</h1>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
-            <Settings className="mr-2 h-4 w-4" />
-            Admin Panel
-          </Button>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <header className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Unmask Protocol</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Bringing transparency and trust to the Web3 ecosystem through verified identities and scam reporting
+        </p>
       </header>
 
-      <main className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight mb-3">
-            Transparency and Security in Web3
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Unmask Protocol provides verification tools and fraud detection for
-            the decentralized ecosystem.
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" onClick={() => navigate("/admin")}>
-              <User className="mr-2 h-5 w-5" />
-              Access Dashboard
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/report")}>
-              <AlertTriangle className="mr-2 h-5 w-5" />
+      <div className="grid md:grid-cols-2 gap-6 mb-12">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
               Report a Scam
-            </Button>
-          </div>
-        </div>
+            </CardTitle>
+            <CardDescription>
+              Help protect the community by reporting fraudulent projects
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">
+              Have you encountered a suspicious Web3 project or potential scam? Report it to our system so we can investigate and warn others.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Link to="/report" className="w-full">
+              <Button className="w-full">
+                Report a Scam
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-12">
-          <Card>
-            <CardHeader>
-              <CardTitle>Identity Verification</CardTitle>
-              <CardDescription>
-                Verify the identity of project owners and team members.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                Our protocol provides secure verification of team identities
-                while respecting privacy concerns.
-              </p>
-            </CardContent>
-          </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BadgeCheck className="h-5 w-5 text-primary" />
+              Register for RugID
+            </CardTitle>
+            <CardDescription>
+              Project owners: Verify your identity and build trust
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">
+              Register your project to receive a verified RugID. This shows your commitment to transparency and helps users identify legitimate projects.
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Link to="/register" className="w-full">
+              <Button className="w-full" variant="outline">
+                Register Your Project
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Fraud Detection</CardTitle>
-              <CardDescription>
-                Advanced monitoring for suspicious activities.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                We use on-chain analysis and community reports to identify
-                potential scams before they can cause harm.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Community Trust</CardTitle>
-              <CardDescription>
-                Building a safer ecosystem together.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                Join our network of verified projects and contribute to a more
-                trustworthy Web3 environment.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-
-      <footer className="border-t mt-12">
-        <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground text-center">
-          © {new Date().getFullYear()} Unmask Protocol. All rights reserved.
-        </div>
-      </footer>
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold mb-4">Admin Access</h2>
+        <p className="mb-4 text-muted-foreground">
+          Access the administrative panel to manage investigations, reports, and user verification
+        </p>
+        <Link to="/admin">
+          <Button variant="outline" size="lg">
+            <Shield className="mr-2 h-5 w-5" /> Admin Panel
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
