@@ -33,4 +33,34 @@ export const investigationsService = {
    */
   getLinkedReports: (investigationId) => 
     get(`/investigations/${investigationId}/reports`),
+    
+  /**
+   * Assign investigation to agent
+   */
+  assignToAgent: (investigationId, agentId) => 
+    put(`/investigations/${investigationId}/assign`, { agentId }),
+    
+  /**
+   * Get investigation package for verification
+   */
+  getInvestigationPackage: (investigationId) => 
+    get(`/investigations/${investigationId}/package`),
+    
+  /**
+   * Submit final verification and prepare for external sharing
+   */
+  submitFinalVerification: (investigationId, verificationData) => 
+    post(`/investigations/${investigationId}/final-verification`, verificationData),
+    
+  /**
+   * Send investigation package to external party
+   */
+  sendInvestigationPackage: (investigationId, destinationData) => 
+    post(`/investigations/${investigationId}/send-package`, destinationData),
+    
+  /**
+   * Get audit log for investigation
+   */
+  getInvestigationAuditLogs: (investigationId) => 
+    get(`/investigations/${investigationId}/audit-logs`),
 };
