@@ -41,4 +41,9 @@ export const agentsService = {
    */
   finalVerification: (agentId, investigationId, finalVerificationData) => 
     post(`/agents/${agentId}/final-verify/${investigationId}`, finalVerificationData),
+  
+  /**
+   * Agent login
+   */
+  login: (credentials) => post('/agents/login', credentials),
 };
