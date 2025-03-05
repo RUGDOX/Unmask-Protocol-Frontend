@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Index from './pages/Index';
 import AdminPanel from './pages/AdminPanel';
 import ReportingPage from './pages/ReportingPage';
@@ -14,7 +14,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <Router>
+    <>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -37,9 +37,9 @@ function App() {
             </ProtectedRoute>
           } />
         </Routes>
-        <Toaster />
       </AuthProvider>
-    </Router>
+      <Toaster />
+    </>
   );
 }
 
