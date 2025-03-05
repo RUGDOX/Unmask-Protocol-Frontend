@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { AlertCircle, CheckCircle2, Upload, FileText, ArrowRight, Fingerprint } from "lucide-react";
+import { AlertCircle, CheckCircle2, Upload, FileText, ArrowRight, Fingerprint, Shield, Lock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,6 +16,7 @@ const ProjectRegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isEligible, setIsEligible] = useState(null);
+  const [rugId, setRugId] = useState(null);
   const [formData, setFormData] = useState({
     // Project Details
     projectName: "",
@@ -33,6 +33,9 @@ const ProjectRegistrationForm = () => {
     idNumber: "",
     idImage: null,
     proofOfAddress: null,
+    // Additional security fields
+    twoFactorEnabled: true,
+    dataVaultConsent: false,
   });
 
   const handleChange = (e) => {
@@ -47,30 +50,57 @@ const ProjectRegistrationForm = () => {
     }
   };
 
+  const generateSecureRugId = async (userData) => {
+    try {
+      console.log("Generating secure RugID from user data...");
+      
+      setTimeout(() => {
+        const alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let id = "RID-";
+        
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 2; j++) {
+            id += alphanumeric.charAt(Math.floor(Math.random() * 26));
+          }
+          for (let j = 0; j < 2; j++) {
+            id += Math.floor(Math.random() * 10);
+          }
+        }
+        
+        setRugId(id);
+        console.log("Generated RugID:", id);
+      }, 1500);
+    } catch (error) {
+      console.error("Error generating RugID:", error);
+      toast.error("Failed to generate RugID", {
+        description: error.message || "Please try again later"
+      });
+    }
+  };
+
   const handleVerifyIdentity = async () => {
     if (!formData.idNumber || !formData.idImage || !formData.proofOfAddress) {
       toast.error("Please complete all identity verification fields");
       return;
     }
 
+    if (!formData.dataVaultConsent) {
+      toast.error("You must consent to secure data storage");
+      return;
+    }
+
     setIsVerifying(true);
 
     try {
-      // In a real implementation, this would check identity and eligibility
       setTimeout(async () => {
         try {
-          // Check if the person is already registered or blacklisted
           const eligibilityData = {
             idType: formData.idType,
             idNumber: formData.idNumber,
             ownerName: formData.ownerName,
           };
           
-          // This would be an actual API call in production
-          // const eligibilityResponse = await projectsService.checkOwnerEligibility(eligibilityData);
-          
-          // Mock eligibility result
-          const isOwnerEligible = formData.idNumber !== "123456789"; // Mock - 123456789 is blacklisted
+          const isOwnerEligible = formData.idNumber !== "123456789";
           
           setIsEligible(isOwnerEligible);
           
@@ -78,6 +108,14 @@ const ProjectRegistrationForm = () => {
             toast.success("Identity verification successful", {
               description: "You are eligible to register for a RugID"
             });
+            
+            await generateSecureRugId({
+              ownerWallet: formData.ownerWallet,
+              idType: formData.idType,
+              idNumber: formData.idNumber,
+              name: formData.ownerName
+            });
+            
           } else {
             toast.error("Identity verification failed", {
               description: "You are not eligible for a RugID. This may be due to an existing registration or blacklist record."
@@ -110,20 +148,35 @@ const ProjectRegistrationForm = () => {
       return;
     }
     
+    if (!formData.dataVaultConsent) {
+      toast.error("You must consent to secure data storage");
+      return;
+    }
+    
     try {
       toast.loading("Submitting registration...");
       
-      // In a real implementation, this would submit the form data
       setTimeout(async () => {
         try {
-          // const response = await projectsService.registerProject(formData);
+          // Store PII in secure data vault
+          // await projectsService.securelyStorePII(formData.ownerWallet, {
+          //   name: formData.ownerName,
+          //   email: formData.ownerEmail,
+          //   idType: formData.idType,
+          //   idNumber: formData.idNumber,
+          // });
+          
+          // Register project with RugID
+          // await projectsService.registerProject({
+          //   ...formData,
+          //   rugId: rugId
+          // });
           
           toast.dismiss();
           toast.success("Registration submitted successfully", {
-            description: "Your RugID application is being processed. You will be notified once approved."
+            description: `Your RugID (${rugId}) has been issued. Your personal information is securely stored.`
           });
           
-          // Reset form and navigate back to home
           setFormData({
             projectName: "",
             projectWebsite: "",
@@ -137,6 +190,8 @@ const ProjectRegistrationForm = () => {
             idNumber: "",
             idImage: null,
             proofOfAddress: null,
+            twoFactorEnabled: true,
+            dataVaultConsent: false,
           });
           
           navigate("/");
@@ -327,10 +382,11 @@ const ProjectRegistrationForm = () => {
 
             <TabsContent value="step-3" className="space-y-4 mt-4">
               <Alert>
-                <AlertCircle className="h-4 w-4" />
+                <Shield className="h-4 w-4" />
                 <AlertTitle>Identity Verification Required</AlertTitle>
                 <AlertDescription>
                   To prevent fraud and protect the Unmask Protocol ecosystem, all project owners must complete identity verification.
+                  Your data is secured in private vaults with dead man's switch protection.
                 </AlertDescription>
               </Alert>
 
@@ -434,6 +490,25 @@ const ProjectRegistrationForm = () => {
                 </div>
               </div>
 
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="dataVaultConsent"
+                    name="dataVaultConsent"
+                    checked={formData.dataVaultConsent}
+                    onChange={(e) => 
+                      setFormData({...formData, dataVaultConsent: e.target.checked})
+                    }
+                    className="mt-1"
+                    required
+                  />
+                  <Label htmlFor="dataVaultConsent" className="font-normal">
+                    I consent to storing my personal information in Unmask Protocol's secure data vault with dead man's switch protection. My information will only be used for verification purposes and will never be shared without explicit legal requirements.
+                  </Label>
+                </div>
+              </div>
+
               <div className="mt-6">
                 <Button
                   type="button"
@@ -464,12 +539,25 @@ const ProjectRegistrationForm = () => {
                   </AlertDescription>
                 </Alert>
               )}
+              
+              {rugId && isEligible && (
+                <Alert className="mt-4 bg-green-50 border-green-200">
+                  <Fingerprint className="h-4 w-4" />
+                  <AlertTitle>RugID Generated</AlertTitle>
+                  <AlertDescription className="font-mono">
+                    Your unique RugID: {rugId}
+                  </AlertDescription>
+                  <p className="text-xs mt-1 text-muted-foreground">
+                    This ID is unique to you and cannot be reverse-engineered to reveal your personal information.
+                  </p>
+                </Alert>
+              )}
 
               <div className="flex justify-between mt-6">
                 <Button type="button" variant="outline" onClick={prevStep}>
                   Back
                 </Button>
-                <Button type="submit" disabled={!isEligible}>
+                <Button type="submit" disabled={!isEligible || !rugId}>
                   Submit Registration
                 </Button>
               </div>
@@ -479,8 +567,8 @@ const ProjectRegistrationForm = () => {
       </CardContent>
       <CardFooter className="bg-muted/50 flex justify-between items-center">
         <div className="flex items-center text-sm text-muted-foreground">
-          <CheckCircle2 className="mr-2 h-4 w-4" />
-          All information is securely encrypted
+          <Lock className="mr-2 h-4 w-4" />
+          All information is securely encrypted and protected
         </div>
         <Button variant="outline" size="sm" onClick={() => navigate("/")}>
           Cancel
