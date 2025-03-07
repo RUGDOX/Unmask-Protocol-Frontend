@@ -2,6 +2,7 @@
 /**
  * Utility functions for API requests
  */
+import { authService } from '../services/authService';
 
 const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.unmask.io'; // Replace with your actual API URL
 
@@ -11,7 +12,7 @@ const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.unmask.io'; /
 async function fetchWithAuth(endpoint, options = {}) {
   try {
     // Add auth token if available
-    const token = localStorage.getItem('auth_token');
+    const token = authService.getToken();
     const headers = {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
@@ -30,9 +31,17 @@ async function fetchWithAuth(endpoint, options = {}) {
 
     if (response.status === 401) {
       // Handle unauthorized (token expired, etc.)
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login?session=expired';
-      throw new Error('Authentication expired. Please login again.');
+      // Try to refresh token once
+      const refreshed = await authService.refreshToken();
+      if (refreshed) {
+        // Retry the request with new token
+        return fetchWithAuth(endpoint, options);
+      } else {
+        // If refresh failed, clear auth and redirect
+        authService.clearAuthData();
+        window.location.href = '/login?session=expired';
+        throw new Error('Authentication expired. Please login again.');
+      }
     }
 
     if (response.status === 403) {

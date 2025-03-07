@@ -11,49 +11,121 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('auth_token');
-    const role = localStorage.getItem('user_role');
-    const id = localStorage.getItem('user_id');
-    
-    if (token && role) {
+  // Function to load user profile from token
+  const loadUserFromToken = async () => {
+    try {
+      // Check if token exists and is valid
+      if (!authService.isAuthenticated()) {
+        setLoading(false);
+        return;
+      }
+
+      // Set up token refresh mechanism
+      authService.setupTokenRefresh();
+
+      // Get basic user data from localStorage
+      const id = authService.getUserId();
+      const role = authService.getUserRole();
+
+      // Set basic user data
       setUser({
         id,
         role,
       });
+
+      // Optionally fetch additional user data from the server
+      try {
+        const userProfile = await authService.getUserProfile();
+        if (userProfile) {
+          setUser(prev => ({
+            ...prev,
+            ...userProfile,
+          }));
+        }
+      } catch (error) {
+        console.error("Could not fetch user profile:", error);
+        // Continue with basic user data
+      }
+    } catch (error) {
+      console.error("Error loading user from token:", error);
+      authService.clearAuthData();
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadUserFromToken();
     
-    setLoading(false);
-  }, []);
+    // Set up event listener for storage changes (for multi-tab synchronization)
+    const handleStorageChange = (e) => {
+      if (e.key === 'auth_token' && !e.newValue) {
+        // Token was removed in another tab
+        setUser(null);
+        navigate('/login');
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [navigate]);
 
   const login = async (credentials) => {
     try {
       setLoading(true);
-      // In a real app, this would call the login API
-      // For now, we'll simulate a response
       
-      // Simulated response for demonstration
-      const response = {
-        token: 'simulated_jwt_token',
-        user: {
+      // For demo purposes only - remove in production
+      if (credentials.username === 'admin' || credentials.username === 'agent') {
+        // Simulated response for demonstration
+        const response = {
+          token: 'simulated_jwt_token',
+          expiresIn: 900, // 15 minutes
           id: credentials.username === 'admin' ? '1' : '2',
           role: credentials.username === 'admin' ? 'admin' : 'agent',
+        };
+        
+        // Store auth data
+        authService.saveAuthData(response);
+        
+        setUser({
+          id: response.id,
+          role: response.role,
+          username: credentials.username,
+        });
+        
+        // Set up token refresh
+        authService.setupTokenRefresh();
+        
+        toast.success(`Welcome back, ${credentials.username}!`);
+        
+        // Redirect based on role
+        if (response.role === 'admin') {
+          navigate('/admin');
+        } else if (response.role === 'agent') {
+          navigate('/agent');
         }
-      };
+        
+        return true;
+      }
       
-      // Store auth data
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user_role', response.user.role);
-      localStorage.setItem('user_id', response.user.id);
+      // Real implementation
+      const response = await authService.login(credentials);
       
-      setUser(response.user);
+      setUser({
+        id: response.id,
+        role: response.role,
+        username: credentials.username,
+      });
+      
       toast.success(`Welcome back, ${credentials.username}!`);
       
       // Redirect based on role
-      if (response.user.role === 'admin') {
+      if (response.role === 'admin') {
         navigate('/admin');
-      } else if (response.user.role === 'agent') {
+      } else if (response.role === 'agent') {
         navigate('/agent');
       }
       
