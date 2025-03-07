@@ -18,21 +18,38 @@ const Index = () => {
       
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Hero Section with binary particles */}
-        <section className="text-center mb-16 relative">
+        <section className="text-center mb-12 relative">
           <div className="binary-particles-bg glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <h1 className="text-4xl font-bold mb-4 text-gradient">Unmask the Threats. Secure Your Future.</h1>
             <p className="text-xl mb-6 max-w-3xl mx-auto">
               In Web3, trust is everything — but scams and fraud put that trust at risk. The Unmask Protocol is your digital ally, providing powerful tools for identity verification, fraud reporting, and secure evidence storage — all backed by the robust FORTRESS data layer.
             </p>
-            <p className="text-lg mb-6 max-w-3xl mx-auto">
-              Unmask Protocol works independently — but when combined with RugHunter, it becomes part of a powerful network built to stop Web3 scams in their tracks.
-            </p>
-            <p className="text-xl font-semibold mb-8 max-w-3xl mx-auto">
-              Expose deception. Enforce accountability. Protect Web3.
-            </p>
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex justify-center gap-4 mt-6">
               <Button className="bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 shadow-glow">Get Started</Button>
               <Button variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-500/10" as={Link} to="/about">Learn More</Button>
+            </div>
+          </div>
+        </section>
+
+        {/* New section between Hero and Features */}
+        <section className="mb-16 relative">
+          <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow flex flex-col md:flex-row items-center gap-8">
+            <div className="w-full md:w-1/2 order-2 md:order-1">
+              <h2 className="text-2xl font-bold mb-4 text-gradient">Your Shield in the Web3 Landscape</h2>
+              <p className="text-lg mb-4">
+                Unmask Protocol works independently — but when combined with RugHunter, it becomes part of a powerful network built to stop Web3 scams in their tracks.
+              </p>
+              <p className="text-xl font-semibold mb-4">
+                Expose deception. Enforce accountability. Protect Web3.
+              </p>
+              <Button className="bg-gradient-to-r from-purple-600 to-blue-700 hover:from-purple-700 hover:to-blue-800 shadow-glow mt-2">
+                Explore Features
+              </Button>
+            </div>
+            <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center">
+              <div className="pulse-subtle">
+                <Shield className="h-32 w-32 text-blue-500" />
+              </div>
             </div>
           </div>
         </section>
