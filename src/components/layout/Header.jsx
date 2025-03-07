@@ -15,19 +15,17 @@ const Header = () => {
     <header className="flex justify-between items-center py-6">
       <div className="flex flex-col items-center">
         <Link to="/" aria-label="Unmask Protocol">
-          <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center">
-            <img 
-              src="/unmask-logo.png" 
-              alt="Unmask Protocol Logo" 
-              className="h-20 w-20"
-              onError={(e) => {
-                e.target.onerror = null; // Prevent infinite error loop
-                console.log("Logo PNG failed to load");
-                // Hide the broken image icon
-                e.target.style.display = 'none';
-              }}
-            />
-          </div>
+          <img 
+            src="/unmask-logo.png" 
+            alt="Unmask Protocol Logo" 
+            className="h-24 w-24"
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite error loop
+              console.log("Logo PNG failed to load");
+              // Hide the broken image icon
+              e.target.style.display = 'none';
+            }}
+          />
         </Link>
       </div>
       
