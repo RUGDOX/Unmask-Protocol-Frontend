@@ -18,19 +18,54 @@ function App() {
     <AuthProvider>
       <div className="min-h-screen flex flex-col">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex-grow">
-          <Header />
-          <main className="py-6">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/rugid" element={<RugIdSearchPage />} />
-              <Route path="/report" element={<ReportingPage />} />
-              <Route path="/register" element={<ProjectRegistrationPage />} />
-              <Route path="/unauthorized" element={<UnauthorizedPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="*" element={<div className="py-20 text-center"><h1 className="text-3xl font-bold">Page Not Found</h1><p className="mt-4">The page you are looking for does not exist.</p></div>} />
-            </Routes>
-          </main>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Header />
+                <Index />
+              </>
+            } />
+            <Route path="/login" element={
+              <>
+                <Header />
+                <LoginPage />
+              </>
+            } />
+            <Route path="/rugid" element={<RugIdSearchPage />} />
+            <Route path="/report" element={
+              <>
+                <Header />
+                <ReportingPage />
+              </>
+            } />
+            <Route path="/register" element={
+              <>
+                <Header />
+                <ProjectRegistrationPage />
+              </>
+            } />
+            <Route path="/unauthorized" element={
+              <>
+                <Header />
+                <UnauthorizedPage />
+              </>
+            } />
+            <Route path="/about" element={
+              <>
+                <Header />
+                <AboutPage />
+              </>
+            } />
+            <Route path="*" element={
+              <>
+                <Header />
+                <div className="py-20 text-center">
+                  <h1 className="text-3xl font-bold">Page Not Found</h1>
+                  <p className="mt-4">The page you are looking for does not exist.</p>
+                </div>
+              </>
+            } />
+          </Routes>
         </div>
         <Footer />
       </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -19,7 +18,7 @@ const Index = () => {
         {/* Hero Section with binary particles */}
         <section className="text-center mb-16 relative">
           <div className="binary-particles-bg glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
-            <h1 className="text-4xl font-bold mb-4 text-gradient animate-float">Unmask Protocol</h1>
+            <h1 className="text-4xl font-bold mb-4 text-gradient">Secure Web3. Reveal Truth.</h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
               Advanced blockchain security platform for detecting scams, verifying projects, and protecting users in the crypto ecosystem.
             </p>

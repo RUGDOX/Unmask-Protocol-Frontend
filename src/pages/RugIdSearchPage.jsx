@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { toast } from "sonner";
 import { Search, Shield, AlertCircle, Check, AlertTriangle, XCircle, Home } from "lucide-react";
@@ -143,12 +142,7 @@ const RugIdSearchPage = () => {
       <header className="relative z-10 border-b border-blue-500/20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <img 
-              src="/unmask-logo.svg" 
-              alt="Unmask Protocol Logo" 
-              className="h-10 w-auto" 
-            />
-            <h1 className="text-xl font-bold text-gradient">Unmask Protocol</h1>
+            <Link to="/" className="text-xl font-bold text-gradient">RugID Verification</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/">
