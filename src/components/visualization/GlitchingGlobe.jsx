@@ -23,7 +23,7 @@ const GlitchingGlobe = () => {
       const renderer = new THREE.WebGLRenderer({ 
         antialias: true,
         alpha: true,
-        powerPreference: 'default' // Use 'low-power' for better mobile performance
+        powerPreference: 'default'
       });
       
       // Make sure the container exists before setting size
@@ -36,57 +36,67 @@ const GlitchingGlobe = () => {
         return;
       }
       
-      // Create globe geometry
-      const globeGeometry = new THREE.SphereGeometry(1, 32, 32);
+      // Create globe geometry with more detail for a professional look
+      const globeGeometry = new THREE.SphereGeometry(1, 48, 48);
       
-      // Create wireframe material with glitch effect
+      // Create wireframe material with subtle colors from the theme
       const wireframeMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8B5CF6, // Purple color
+        color: 0x0052FF, // Using crypto.blue from the theme
         wireframe: true,
         transparent: true,
-        opacity: 0.6
+        opacity: 0.4
       });
       
-      // Add second glowing layer
-      const glowGeometry = new THREE.SphereGeometry(1.05, 32, 32);
+      // Add second layer
+      const glowGeometry = new THREE.SphereGeometry(1.05, 48, 48);
       const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x0EA5E9, // Blue color
+        color: 0x8B5CF6, // Using crypto.purple from the theme
         wireframe: true,
         transparent: true,
-        opacity: 0.3
+        opacity: 0.2
       });
       
-      // Add third particles layer - reduced complexity for better performance
-      const particlesGeometry = new THREE.SphereGeometry(1.15, 16, 16);
+      // Add third particles layer
+      const particlesGeometry = new THREE.SphereGeometry(1.15, 24, 24);
       const particlesMaterial = new THREE.PointsMaterial({
-        color: 0xD946EF, // Pink color
-        size: 0.05,
+        color: 0x14B8A6, // Using crypto.cyan from the theme
+        size: 0.03,
         transparent: true,
-        opacity: 0.7
+        opacity: 0.5
+      });
+      
+      // Add a subtle inner core for depth
+      const coreGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+      const coreMaterial = new THREE.MeshBasicMaterial({
+        color: 0x0052FF, // Crypto.blue
+        transparent: true,
+        opacity: 0.1
       });
       
       const globe = new THREE.Mesh(globeGeometry, wireframeMaterial);
       const glow = new THREE.Mesh(glowGeometry, glowMaterial);
       const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+      const core = new THREE.Mesh(coreGeometry, coreMaterial);
       
       scene.add(globe);
       scene.add(glow);
       scene.add(particles);
+      scene.add(core);
       
-      // Glitch effect timing variables
+      // Subtle glitch effect timing variables - less frequent and less dramatic
       let lastGlitchTime = 0;
-      let nextGlitchTime = Math.random() * 2000 + 1000; // Random time between 1-3 seconds
+      let nextGlitchTime = Math.random() * 4000 + 3000; // Less frequent (3-7 seconds)
       let isGlitching = false;
       let glitchDuration = 0;
       
       // Animation loop with better performance
       let animationFrameId;
       let lastFrameTime = 0;
-      const targetFPS = 30; // Lower FPS for better performance
+      const targetFPS = 30;
       const frameInterval = 1000 / targetFPS;
       
       const animate = (currentTime) => {
-        if (!isMounted) return; // Don't continue if component unmounted
+        if (!isMounted) return;
         
         animationFrameId = requestAnimationFrame(animate);
         
@@ -94,55 +104,69 @@ const GlitchingGlobe = () => {
         if (currentTime - lastFrameTime < frameInterval) return;
         lastFrameTime = currentTime;
         
-        // Constant rotation
-        globe.rotation.y += 0.003;
-        glow.rotation.y -= 0.002;
-        particles.rotation.y += 0.001;
+        // Gentle rotation for a more sophisticated feel
+        globe.rotation.y += 0.002;
+        glow.rotation.y -= 0.001;
+        particles.rotation.y += 0.0005;
+        core.rotation.y -= 0.0008;
         
-        // Random axis rotation for more complex movement
-        globe.rotation.x = Math.sin(Date.now() * 0.0005) * 0.2;
-        glow.rotation.x = Math.sin(Date.now() * 0.0003) * 0.2;
+        // Subtle axis tilt
+        globe.rotation.x = Math.sin(Date.now() * 0.0003) * 0.1;
+        glow.rotation.x = Math.sin(Date.now() * 0.0002) * 0.1;
         
-        // Glitch effect timing
+        // More refined glitch effect
         const now = Date.now();
         
         if (!isGlitching && now - lastGlitchTime > nextGlitchTime) {
           // Start glitching
           isGlitching = true;
-          glitchDuration = Math.random() * 200 + 100; // Glitch for 100-300ms
+          glitchDuration = Math.random() * 100 + 50; // Shorter duration (50-150ms)
           lastGlitchTime = now;
           
-          // Apply glitch effect
-          globe.scale.x += (Math.random() - 0.5) * 0.1;
-          globe.scale.y += (Math.random() - 0.5) * 0.1;
-          globe.position.x += (Math.random() - 0.5) * 0.1;
-          wireframeMaterial.color.setHex(
-            Math.random() > 0.5 ? 0xF97316 : 0x8B5CF6
-          );
+          // Subtle glitch effect
+          globe.scale.x += (Math.random() - 0.5) * 0.05;
+          globe.scale.y += (Math.random() - 0.5) * 0.05;
+          globe.position.x += (Math.random() - 0.5) * 0.05;
+          
+          // Use only theme colors for glitching
+          const themeColors = [0x0052FF, 0x8B5CF6, 0x14B8A6]; // blue, purple, cyan
+          wireframeMaterial.color.setHex(themeColors[Math.floor(Math.random() * themeColors.length)]);
         } else if (isGlitching && now - lastGlitchTime > glitchDuration) {
           // Stop glitching
           isGlitching = false;
-          nextGlitchTime = Math.random() * 2000 + 1000; // Random time for next glitch
+          nextGlitchTime = Math.random() * 4000 + 3000;
           
           // Reset glitch effect
           globe.scale.set(1, 1, 1);
           globe.position.x = 0;
-          wireframeMaterial.color.setHex(0x8B5CF6);
+          wireframeMaterial.color.setHex(0x0052FF); // Reset to default blue
         }
         
-        // Only render if component is mounted
         if (mountRef.current) {
           renderer.render(scene, camera);
         }
       };
       
+      // Add a subtle pulse animation to the core for more depth
+      const pulseCycle = () => {
+        if (!isMounted) return;
+        
+        const t = Date.now() * 0.001;
+        const scale = 0.9 + Math.sin(t) * 0.05;
+        if (core) {
+          core.scale.set(scale, scale, scale);
+        }
+        
+        setTimeout(pulseCycle, 50);
+      };
+      
+      pulseCycle();
+      
       // Start animation loop
       animate(0);
-      
-      // Set loaded state
       setIsLoaded(true);
       
-      // Handle window resize more efficiently with debounce
+      // Handle window resize with debounce
       let resizeTimeout;
       const handleResize = () => {
         clearTimeout(resizeTimeout);
@@ -158,13 +182,14 @@ const GlitchingGlobe = () => {
       // Cleanup
       return () => {
         isMounted = false;
+        
         if (animationFrameId) {
           cancelAnimationFrame(animationFrameId);
         }
         
         window.removeEventListener('resize', handleResize);
         
-        // Clean DOM element if it still exists
+        // Clean DOM element
         if (mountRef.current && renderer.domElement && mountRef.current.contains(renderer.domElement)) {
           mountRef.current.removeChild(renderer.domElement);
         }
@@ -176,6 +201,8 @@ const GlitchingGlobe = () => {
         glowMaterial.dispose();
         particlesGeometry.dispose();
         particlesMaterial.dispose();
+        coreGeometry.dispose();
+        coreMaterial.dispose();
         renderer.dispose();
       };
     } catch (error) {
