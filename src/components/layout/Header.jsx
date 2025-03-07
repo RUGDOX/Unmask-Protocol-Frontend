@@ -18,12 +18,12 @@ const Header = () => {
           <img 
             src="/unmask-logo.png" 
             alt="Unmask Protocol Logo" 
-            className="h-24 w-24"
+            className="h-24 w-24 object-contain"
             onError={(e) => {
               e.target.onerror = null; // Prevent infinite error loop
               console.log("Logo PNG failed to load");
-              // Hide the broken image icon
-              e.target.style.display = 'none';
+              // Use SVG as fallback
+              e.target.src = '/unmask-logo.svg';
             }}
           />
         </Link>

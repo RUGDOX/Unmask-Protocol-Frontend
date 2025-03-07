@@ -38,6 +38,7 @@
       #loading-logo {
         width: 120px;
         height: 120px;
+        object-fit: contain;
         animation: pulse 2s infinite;
       }
       
@@ -54,7 +55,7 @@
         id="loading-logo" 
         src="/unmask-logo.png" 
         alt="Unmask Protocol Logo"
-        onerror="this.onerror=null; console.log('Loading logo failed'); this.style.display='none';" 
+        onerror="this.onerror=null; this.src='/unmask-logo.svg'; console.log('Loading PNG failed, using SVG fallback');" 
       />
     </div>
     <div id="root"></div>
