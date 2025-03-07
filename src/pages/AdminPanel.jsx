@@ -1,8 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Button } from "../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Link } from 'react-router-dom';
 import ReportsList from "../components/ReportsList";
 
 // Import admin components
@@ -14,6 +11,7 @@ import SettingsTab from "../components/admin/SettingsTab";
 import ModulesTab from "../components/admin/ModulesTab";
 import SecurityTab from "../components/admin/SecurityTab";
 import BlockchainTab from "../components/admin/BlockchainTab";
+import AdminHeader from "../components/admin/AdminHeader";
 
 const AdminPanel = () => {
   const [alerts, setAlerts] = useState([]);
@@ -139,14 +137,7 @@ const AdminPanel = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Unmask Protocol Admin Panel</h1>
-        <Link to="/">
-          <Button variant="outline">
-            Return to Dashboard
-          </Button>
-        </Link>
-      </div>
+      <AdminHeader alerts={alerts} />
       
       <Tabs defaultValue="dashboard" className="w-full">
         <TabsList className="grid w-full grid-cols-9">
