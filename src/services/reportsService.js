@@ -1,3 +1,4 @@
+
 import { post, get, put, del } from '../utils/api';
 
 export const reportsService = {
@@ -126,22 +127,34 @@ export const reportsService = {
    */
   submitToThreatDatabase: async (reportData) => {
     try {
-      // This would be your actual API endpoint
-      const response = await post('/api/threat-stream', {
+      // Send to frontend threat stream
+      const frontendResponse = await post('/api/threat-stream', {
         ...reportData,
         timestamp: new Date().toISOString(),
         source: 'unmask-protocol',
         threatType: 'web3-scam',
-        // Add any additional fields required by your Fortress data layer
       });
 
-      // Also submit to RugHunter AI endpoint
+      // Send to RugHunter AI endpoint
       await post('/api/rughunter/federated-learning', {
         reportData,
         modelUpdate: true,
       });
 
-      return response;
+      // Also attempt to send to the backend system if available
+      try {
+        // This will be caught and gracefully handled if the backend isn't available
+        await post('/api/threat-stream/external', {
+          ...reportData,
+          source: 'unmask-protocol-frontend',
+          timestamp: new Date().toISOString()
+        });
+      } catch (backendError) {
+        // Log but don't fail the whole operation
+        console.warn('Could not submit to backend threat stream:', backendError);
+      }
+
+      return frontendResponse;
     } catch (error) {
       console.error('Failed to submit to threat database:', error);
       throw error;
