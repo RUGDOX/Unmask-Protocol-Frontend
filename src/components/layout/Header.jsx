@@ -15,13 +15,12 @@ const Header = () => {
     <header className="flex justify-between items-center py-6">
       <div className="flex items-center gap-2">
         <img 
-          src="/unmask-logo.svg" 
+          src="/unmask-logo.png" 
           alt="Unmask Protocol Logo" 
           className="h-8 w-8"
           onError={(e) => {
             e.target.onerror = null; // Prevent infinite error loop
-            console.log("Logo SVG failed to load, trying PNG");
-            e.target.src = "/unmask-logo.png";
+            console.log("Logo PNG failed to load");
           }}
         />
         <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
