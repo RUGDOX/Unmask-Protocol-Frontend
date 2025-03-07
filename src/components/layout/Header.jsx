@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center py-6">
       <div className="flex items-center gap-2">
-        <img src="/unmask-logo.svg" alt="Unmask Protocol Logo" className="h-8 w-8" />
+        <img src="/unmask-logo.png" alt="Unmask Protocol Logo" className="h-8 w-8" />
         <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
       </div>
       
