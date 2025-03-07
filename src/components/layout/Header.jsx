@@ -13,21 +13,22 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center py-6">
-      <div className="flex flex-col items-center md:flex-col md:items-start">
-        <div className="w-24 h-24 mb-2 bg-blue-600 rounded-full flex items-center justify-center">
-          <img 
-            src="/unmask-logo.png" 
-            alt="Unmask Protocol Logo" 
-            className="h-20 w-20"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite error loop
-              console.log("Logo PNG failed to load");
-              // Hide the broken image icon
-              e.target.style.display = 'none';
-            }}
-          />
-        </div>
-        <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
+      <div className="flex flex-col items-center">
+        <Link to="/" aria-label="Unmask Protocol">
+          <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center">
+            <img 
+              src="/unmask-logo.png" 
+              alt="Unmask Protocol Logo" 
+              className="h-20 w-20"
+              onError={(e) => {
+                e.target.onerror = null; // Prevent infinite error loop
+                console.log("Logo PNG failed to load");
+                // Hide the broken image icon
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        </Link>
       </div>
       
       {/* Desktop Navigation */}
