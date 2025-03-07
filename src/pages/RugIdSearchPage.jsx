@@ -131,10 +131,16 @@ const RugIdSearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-purple-950/30 pointer-events-none"></div>
+    <div className="min-h-screen bg-black relative">
+      {/* Tech particle background */}
+      <div className="particle-container absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="tech-particles"></div>
+      </div>
       
-      <header className="relative border-b border-blue-500/20">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-indigo-950/30 to-purple-950/40 pointer-events-none z-0"></div>
+      
+      <header className="relative z-10 border-b border-blue-500/20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img 
@@ -156,7 +162,7 @@ const RugIdSearchPage = () => {
         </div>
       </header>
 
-      <div className="container relative mx-auto py-8 px-4">
+      <div className="container relative z-10 mx-auto py-8 px-4">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2 text-gradient glow-effect">
             RugID Verification
@@ -167,7 +173,7 @@ const RugIdSearchPage = () => {
           </p>
         </div>
         
-        <Card className="max-w-2xl mx-auto bg-gray-900/80 backdrop-blur-sm border-0 dark:border-gray-700 shimmer">
+        <Card className="max-w-2xl mx-auto bg-gray-900/80 backdrop-blur-sm border border-blue-500/20 shadow-glow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Shield className="h-5 w-5 text-blue-400" />
@@ -192,7 +198,7 @@ const RugIdSearchPage = () => {
                 <Button 
                   type="submit" 
                   disabled={isSearching}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 shadow-blue-500/20 shadow-sm"
                 >
                   {isSearching ? "Searching..." : "Search"}
                 </Button>
@@ -208,7 +214,7 @@ const RugIdSearchPage = () => {
             </form>
             
             {searchResult && (
-              <div className="mt-6 space-y-4 border rounded-md p-4 border-blue-500/20 bg-gray-800/60">
+              <div className="mt-6 space-y-4 border rounded-md p-4 border-blue-500/20 bg-gray-800/60 backdrop-blur-sm animate-fade-in">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-semibold text-white">{searchResult.projectName}</h3>
