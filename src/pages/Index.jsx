@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -80,10 +79,10 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works - UPDATED with corrected information */}
+        {/* How It Works - UPDATED with adjusted heading */}
         <section className="mb-16 relative z-10">
           <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
-            <h2 className="text-3xl font-bold mb-6 text-center text-gradient">Exposing Bad Actors in Web3</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center text-gradient">Fraud Detection Process</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left side - Steps with updated descriptions */}
