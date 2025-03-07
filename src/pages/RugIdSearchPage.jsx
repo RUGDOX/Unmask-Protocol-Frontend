@@ -206,44 +206,6 @@ const RugIdSearchPage = () => {
                 </Alert>
               )}
             </form>
-            
-            {searchResult && (
-              <div className="mt-6 space-y-4 border rounded-md p-4 border-blue-500/20 bg-gray-800/60 backdrop-blur-sm animate-fade-in">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">{searchResult.projectName}</h3>
-                    <p className="text-sm text-blue-300">RugID: {searchResult.rugId}</p>
-                  </div>
-                  <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeClass(searchResult.status)}`}>
-                    {getStatusIcon(searchResult.status)}
-                    <span className="ml-1">{formatStatus(searchResult.status)}</span>
-                  </div>
-                </div>
-                
-                {searchResult.lastVerified && (
-                  <p className="text-sm text-blue-200">
-                    Last verified: {searchResult.lastVerified}
-                  </p>
-                )}
-                
-                {searchResult.statusHistory && searchResult.statusHistory.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2 text-white">Status History:</h4>
-                    <div className="space-y-2">
-                      {searchResult.statusHistory.map((item, index) => (
-                        <div key={index} className="flex items-center text-sm">
-                          <div className="w-24 text-gray-400">{item.date}</div>
-                          <div className="flex items-center">
-                            {getStatusIcon(item.status)}
-                            <span className="ml-1 text-gray-200">{formatStatus(item.status)}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </CardContent>
           <CardFooter className="bg-gray-800/40 text-sm text-gray-400 border-t border-blue-500/10">
             <div className="flex items-center">
