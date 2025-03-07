@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
-import { rugidPublicService } from '../services/rugidPublicService';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { Link } from 'react-router-dom';
 
@@ -132,16 +131,22 @@ const RugIdSearchPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900 transition-colors duration-200">
-      <header className="border-b dark:border-gray-800">
+    <div className="min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-purple-950/30 pointer-events-none"></div>
+      
+      <header className="relative border-b border-blue-500/20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary dark:text-blue-400" />
-            <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Unmask Protocol</h1>
+            <img 
+              src="/unmask-logo.svg" 
+              alt="Unmask Protocol Logo" 
+              className="h-10 w-auto" 
+            />
+            <h1 className="text-xl font-bold text-gradient">Unmask Protocol</h1>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-blue-100 hover:bg-blue-900/30 border border-blue-500/20">
                 <Home className="mr-2 h-4 w-4" />
                 Home
               </Button>
@@ -151,22 +156,24 @@ const RugIdSearchPage = () => {
         </div>
       </header>
 
-      <div className="container mx-auto py-8 px-4">
+      <div className="container relative mx-auto py-8 px-4">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600">Unmask Protocol RugID Verification</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto dark:text-gray-400">
+          <h1 className="text-3xl font-bold mb-2 text-gradient glow-effect">
+            RugID Verification
+          </h1>
+          <p className="text-blue-100 max-w-2xl mx-auto">
             Verify the status of any Web3 project or entity by searching their RugID.
             RugIDs help protect communities while preserving privacy for honest builders.
           </p>
         </div>
         
-        <Card className="max-w-2xl mx-auto bg-card dark:bg-gray-800/50 dark:backdrop-blur-sm dark:border-gray-700">
+        <Card className="max-w-2xl mx-auto bg-gray-900/80 backdrop-blur-sm border-0 dark:border-gray-700 shimmer">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Shield className="h-5 w-5 text-blue-400" />
               RugID Search
             </CardTitle>
-            <CardDescription className="dark:text-gray-400">
+            <CardDescription className="text-gray-300">
               Enter a valid RugID to check its verification status
             </CardDescription>
           </CardHeader>
@@ -174,12 +181,12 @@ const RugIdSearchPage = () => {
             <form onSubmit={handleSearch} className="space-y-4">
               <div className="flex gap-2">
                 <div className="relative flex-grow">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
                   <Input
                     placeholder="Enter RugID (e.g., RID-XX00XX00XX00)"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 dark:bg-gray-900/50 dark:border-gray-700"
+                    className="pl-8 bg-gray-800 border-blue-500/20 text-white"
                   />
                 </div>
                 <Button 
@@ -192,7 +199,7 @@ const RugIdSearchPage = () => {
               </div>
               
               {errorMessage && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="bg-red-900/60 border-red-500/30 text-red-100">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Error</AlertTitle>
                   <AlertDescription>{errorMessage}</AlertDescription>
@@ -201,11 +208,11 @@ const RugIdSearchPage = () => {
             </form>
             
             {searchResult && (
-              <div className="mt-6 space-y-4 border rounded-md p-4 dark:border-gray-700 dark:bg-gray-900/50">
+              <div className="mt-6 space-y-4 border rounded-md p-4 border-blue-500/20 bg-gray-800/60">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-semibold">{searchResult.projectName}</h3>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">RugID: {searchResult.rugId}</p>
+                    <h3 className="text-lg font-semibold text-white">{searchResult.projectName}</h3>
+                    <p className="text-sm text-blue-300">RugID: {searchResult.rugId}</p>
                   </div>
                   <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeClass(searchResult.status)}`}>
                     {getStatusIcon(searchResult.status)}
@@ -214,21 +221,21 @@ const RugIdSearchPage = () => {
                 </div>
                 
                 {searchResult.lastVerified && (
-                  <p className="text-sm dark:text-gray-400">
+                  <p className="text-sm text-blue-200">
                     Last verified: {searchResult.lastVerified}
                   </p>
                 )}
                 
                 {searchResult.statusHistory && searchResult.statusHistory.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2 dark:text-gray-300">Status History:</h4>
+                    <h4 className="text-sm font-medium mb-2 text-white">Status History:</h4>
                     <div className="space-y-2">
                       {searchResult.statusHistory.map((item, index) => (
                         <div key={index} className="flex items-center text-sm">
-                          <div className="w-24 text-muted-foreground dark:text-gray-500">{item.date}</div>
+                          <div className="w-24 text-gray-400">{item.date}</div>
                           <div className="flex items-center">
                             {getStatusIcon(item.status)}
-                            <span className="ml-1 dark:text-gray-300">{formatStatus(item.status)}</span>
+                            <span className="ml-1 text-gray-200">{formatStatus(item.status)}</span>
                           </div>
                         </div>
                       ))}
@@ -238,9 +245,9 @@ const RugIdSearchPage = () => {
               </div>
             )}
           </CardContent>
-          <CardFooter className="bg-muted/30 dark:bg-gray-900/30 text-sm text-muted-foreground dark:text-gray-500">
+          <CardFooter className="bg-gray-800/40 text-sm text-gray-400 border-t border-blue-500/10">
             <div className="flex items-center">
-              <AlertCircle className="mr-2 h-4 w-4" />
+              <AlertCircle className="mr-2 h-4 w-4 text-blue-400" />
               <p>RugID statuses are verified by Unmask Protocol's investigation team. No personal information is displayed.</p>
             </div>
           </CardFooter>
