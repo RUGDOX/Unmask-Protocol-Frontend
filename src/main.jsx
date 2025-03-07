@@ -5,16 +5,16 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
 
-// Direct initialization without error-prone wrappers
-const rootElement = document.getElementById("root");
+// Get the root element
+const root = document.getElementById("root");
 
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode>
+// Create and render the app
+if (root) {
+  const reactRoot = ReactDOM.createRoot(root);
+  reactRoot.render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   );
   
   // Hide loading screen after rendering
@@ -23,5 +23,5 @@ if (rootElement) {
     loadingScreen.style.display = 'none';
   }
 } else {
-  console.error("Fatal: Could not find root element!");
+  console.error("Could not find root element");
 }
