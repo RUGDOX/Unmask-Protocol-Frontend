@@ -2,13 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { Shield } from 'lucide-react';
 
 const Header = () => {
   return (
     <header className="flex justify-between items-center py-6">
       <div className="flex items-center gap-2">
-        <Shield className="h-6 w-6 text-blue-500" />
+        <img src="/unmask-logo.svg" alt="Unmask Protocol Logo" className="h-8 w-8" />
         <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
       </div>
       
