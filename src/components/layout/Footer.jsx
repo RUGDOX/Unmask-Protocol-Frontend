@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +9,7 @@ const Footer = () => {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <img 
-              src="/unmask-logo.png" 
+              src="/unmask-logo.svg" 
               alt="Unmask Protocol Logo" 
               className="h-6 w-6 object-contain"
             />

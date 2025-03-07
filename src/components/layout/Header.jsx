@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
@@ -15,7 +16,7 @@ const Header = () => {
       <div className="flex flex-col items-center">
         <Link to="/" aria-label="Unmask Protocol">
           <img 
-            src="/unmask-logo.png" 
+            src="/unmask-logo.svg" 
             alt="Unmask Protocol Logo" 
             className="h-24 w-24 object-contain"
           />
