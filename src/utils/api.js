@@ -4,7 +4,8 @@
  */
 import { authService } from '../services/authService';
 
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'https://api.unmask.io';
+// Use import.meta.env instead of process.env for Vite projects
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.unmask.io';
 
 // Simple in-memory cache
 const apiCache = new Map();
