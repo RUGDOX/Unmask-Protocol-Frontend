@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -36,28 +37,28 @@
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 47.4% 5.2%;
     --foreground: 210 40% 98%;
  
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 47.4% 6.2%;
     --card-foreground: 210 40% 98%;
  
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 47.4% 5.2%;
     --popover-foreground: 210 40% 98%;
  
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
  
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217.2 32.6% 12.5%;
     --secondary-foreground: 210 40% 98%;
  
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217.2 32.6% 12.5%;
+    --muted-foreground: 215 20.2% 75.1%;
  
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 217.2 32.6% 12.5%;
     --accent-foreground: 210 40% 98%;
  
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 40.6%;
     --destructive-foreground: 210 40% 98%;
  
     --border: 217.2 32.6% 17.5%;
@@ -72,5 +73,47 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom gradient animations */
+@layer utilities {
+  .glow-effect {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .glow-effect::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(137, 247, 254, 0.1) 0%,
+      rgba(102, 166, 255, 0.1) 25%,
+      rgba(93, 93, 255, 0.1) 50%,
+      rgba(41, 84, 255, 0.1) 75%,
+      rgba(59, 130, 246, 0.0) 100%
+    );
+    opacity: 0;
+    z-index: -1;
+    animation: glow 8s linear infinite;
+  }
+  
+  @keyframes glow {
+    0% {
+      transform: rotate(0deg);
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.1;
+    }
+    100% {
+      transform: rotate(360deg);
+      opacity: 0.3;
+    }
   }
 }

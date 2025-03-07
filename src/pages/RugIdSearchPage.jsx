@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
 import { toast } from "sonner";
-import { Search, Shield, AlertCircle, Check, AlertTriangle, XCircle } from "lucide-react";
+import { Search, Shield, AlertCircle, Check, AlertTriangle, XCircle, Home } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { rugidPublicService } from '../services/rugidPublicService';
+import { ThemeToggle } from '../components/ThemeToggle';
+import { Link } from 'react-router-dom';
 
 const RugIdSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,96 +132,120 @@ const RugIdSearchPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Unmask Protocol RugID Verification</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Verify the status of any Web3 project or entity by searching their RugID.
-          RugIDs help protect communities while preserving privacy for honest builders.
-        </p>
-      </div>
-      
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
-            RugID Search
-          </CardTitle>
-          <CardDescription>
-            Enter a valid RugID to check its verification status
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="flex gap-2">
-              <div className="relative flex-grow">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Enter RugID (e.g., RID-XX00XX00XX00)"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <Button type="submit" disabled={isSearching}>
-                {isSearching ? "Searching..." : "Search"}
+    <div className="min-h-screen bg-background dark:bg-gray-900 transition-colors duration-200">
+      <header className="border-b dark:border-gray-800">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary dark:text-blue-400" />
+            <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Unmask Protocol</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <Home className="mr-2 h-4 w-4" />
+                Home
               </Button>
-            </div>
-            
-            {errorMessage && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-          </form>
-          
-          {searchResult && (
-            <div className="mt-6 space-y-4 border rounded-md p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold">{searchResult.projectName}</h3>
-                  <p className="text-sm text-muted-foreground">RugID: {searchResult.rugId}</p>
+            </Link>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto py-8 px-4">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600">Unmask Protocol RugID Verification</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto dark:text-gray-400">
+            Verify the status of any Web3 project or entity by searching their RugID.
+            RugIDs help protect communities while preserving privacy for honest builders.
+          </p>
+        </div>
+        
+        <Card className="max-w-2xl mx-auto bg-card dark:bg-gray-800/50 dark:backdrop-blur-sm dark:border-gray-700">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+              RugID Search
+            </CardTitle>
+            <CardDescription className="dark:text-gray-400">
+              Enter a valid RugID to check its verification status
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSearch} className="space-y-4">
+              <div className="flex gap-2">
+                <div className="relative flex-grow">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Enter RugID (e.g., RID-XX00XX00XX00)"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-8 dark:bg-gray-900/50 dark:border-gray-700"
+                  />
                 </div>
-                <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeClass(searchResult.status)}`}>
-                  {getStatusIcon(searchResult.status)}
-                  <span className="ml-1">{formatStatus(searchResult.status)}</span>
-                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isSearching}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                >
+                  {isSearching ? "Searching..." : "Search"}
+                </Button>
               </div>
               
-              {searchResult.lastVerified && (
-                <p className="text-sm">
-                  Last verified: {searchResult.lastVerified}
-                </p>
+              {errorMessage && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
               )}
-              
-              {searchResult.statusHistory && searchResult.statusHistory.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium mb-2">Status History:</h4>
-                  <div className="space-y-2">
-                    {searchResult.statusHistory.map((item, index) => (
-                      <div key={index} className="flex items-center text-sm">
-                        <div className="w-24 text-muted-foreground">{item.date}</div>
-                        <div className="flex items-center">
-                          {getStatusIcon(item.status)}
-                          <span className="ml-1">{formatStatus(item.status)}</span>
-                        </div>
-                      </div>
-                    ))}
+            </form>
+            
+            {searchResult && (
+              <div className="mt-6 space-y-4 border rounded-md p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">{searchResult.projectName}</h3>
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">RugID: {searchResult.rugId}</p>
+                  </div>
+                  <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusBadgeClass(searchResult.status)}`}>
+                    {getStatusIcon(searchResult.status)}
+                    <span className="ml-1">{formatStatus(searchResult.status)}</span>
                   </div>
                 </div>
-              )}
+                
+                {searchResult.lastVerified && (
+                  <p className="text-sm dark:text-gray-400">
+                    Last verified: {searchResult.lastVerified}
+                  </p>
+                )}
+                
+                {searchResult.statusHistory && searchResult.statusHistory.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium mb-2 dark:text-gray-300">Status History:</h4>
+                    <div className="space-y-2">
+                      {searchResult.statusHistory.map((item, index) => (
+                        <div key={index} className="flex items-center text-sm">
+                          <div className="w-24 text-muted-foreground dark:text-gray-500">{item.date}</div>
+                          <div className="flex items-center">
+                            {getStatusIcon(item.status)}
+                            <span className="ml-1 dark:text-gray-300">{formatStatus(item.status)}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+          <CardFooter className="bg-muted/30 dark:bg-gray-900/30 text-sm text-muted-foreground dark:text-gray-500">
+            <div className="flex items-center">
+              <AlertCircle className="mr-2 h-4 w-4" />
+              <p>RugID statuses are verified by Unmask Protocol's investigation team. No personal information is displayed.</p>
             </div>
-          )}
-        </CardContent>
-        <CardFooter className="bg-muted/50 text-sm text-muted-foreground">
-          <div className="flex items-center">
-            <AlertCircle className="mr-2 h-4 w-4" />
-            <p>RugID statuses are verified by Unmask Protocol's investigation team. No personal information is displayed.</p>
-          </div>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+      </div>
     </div>
   );
 };
