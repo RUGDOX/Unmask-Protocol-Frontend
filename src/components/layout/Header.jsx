@@ -16,9 +16,9 @@ const Header = () => {
       <div className="flex flex-col items-center">
         <Link to="/" aria-label="Unmask Protocol">
           <img 
-            src="/unmask-logo.svg" 
+            src="/unmask-logo-main.png" 
             alt="Unmask Protocol Logo" 
-            className="h-24 w-24 object-contain"
+            className="h-24 w-auto object-contain"
           />
         </Link>
       </div>
@@ -29,6 +29,7 @@ const Header = () => {
         <Link to="/rugid" className="text-white hover:text-blue-400 transition-colors">RugID</Link>
         <Link to="/report" className="text-white hover:text-blue-400 transition-colors">Report</Link>
         <Link to="/register" className="text-white hover:text-blue-400 transition-colors">Register Project</Link>
+        <Link to="/about" className="text-white hover:text-blue-400 transition-colors">About</Link>
       </nav>
       
       {/* Mobile Menu Button */}
@@ -52,6 +53,7 @@ const Header = () => {
             <Link to="/rugid" className="text-white hover:text-blue-400 py-2" onClick={toggleMobileMenu}>RugID</Link>
             <Link to="/report" className="text-white hover:text-blue-400 py-2" onClick={toggleMobileMenu}>Report</Link>
             <Link to="/register" className="text-white hover:text-blue-400 py-2" onClick={toggleMobileMenu}>Register Project</Link>
+            <Link to="/about" className="text-white hover:text-blue-400 py-2" onClick={toggleMobileMenu}>About</Link>
             <div className="flex flex-col pt-2 space-y-2">
               <Button variant="outline" className="border-blue-500 text-blue-500 w-full">Sign In</Button>
               <Button className="bg-blue-600 hover:bg-blue-700 w-full">Get Started</Button>

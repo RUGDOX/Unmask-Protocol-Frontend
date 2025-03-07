@@ -9,11 +9,10 @@ const Footer = () => {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <img 
-              src="/unmask-logo.svg" 
+              src="/unmask-logo-main.png" 
               alt="Unmask Protocol Logo" 
-              className="h-6 w-6 object-contain"
+              className="h-8 w-auto object-contain"
             />
-            <span className="text-xl font-bold">Unmask Protocol</span>
           </div>
           <p className="text-gray-400 mb-4">
             Blockchain security platform protecting users from scams and verifying legitimate projects.
