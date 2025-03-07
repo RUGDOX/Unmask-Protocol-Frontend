@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Shield, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
+import GlitchingGlobe from '../components/visualization/GlitchingGlobe';
 
 const Index = () => {
   return (
@@ -56,7 +58,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Blockchain visualization */}
+        {/* Blockchain visualization with Glitching Globe */}
         <section className="mb-16 relative z-10">
           <div className="blockchain-visualization glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <h2 className="text-3xl font-bold mb-6 text-center text-gradient">Securing the Blockchain Ecosystem</h2>
@@ -69,8 +71,8 @@ const Index = () => {
                   The Unmask Protocol combines AI-driven analysis with human expert verification to provide the most reliable security assessments in the crypto space.
                 </p>
               </div>
-              <div className="w-full md:w-1/2 h-64 rounded-lg overflow-hidden blockchain-nodes-animation">
-                {/* Blockchain nodes animation container */}
+              <div className="w-full md:w-1/2 h-64 rounded-lg overflow-hidden">
+                <GlitchingGlobe />
               </div>
             </div>
           </div>
