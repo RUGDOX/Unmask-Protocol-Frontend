@@ -35,11 +35,21 @@
         z-index: 9999;
       }
       
-      #loading-logo {
+      #loading-logo-container {
         width: 120px;
         height: 120px;
+        background-color: #3B82F6;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-bottom: 20px;
         animation: pulse 2s infinite;
+      }
+      
+      #loading-logo {
+        width: 100px;
+        height: 100px;
       }
       
       @keyframes pulse {
@@ -57,12 +67,14 @@
   </head>
   <body>
     <div id="loading-screen">
-      <img 
-        id="loading-logo" 
-        src="/unmask-logo.png" 
-        alt="Unmask Protocol Logo"
-        onerror="this.onerror=null; console.log('Loading logo failed'); this.style.background='#3B82F6'; this.style.borderRadius='50%';" 
-      />
+      <div id="loading-logo-container">
+        <img 
+          id="loading-logo" 
+          src="/unmask-logo.png" 
+          alt="Unmask Protocol Logo"
+          onerror="this.onerror=null; console.log('Loading logo failed'); this.style.display='none';" 
+        />
+      </div>
       <div id="loading-text">Loading Unmask Protocol...</div>
     </div>
     <div id="root"></div>
