@@ -1,11 +1,40 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Badge } from "../ui/badge";
 import { AlertCircle } from "lucide-react";
+import { investigationsService } from "../../services/investigationsService";
+import { toast } from "sonner";
 
-const InvestigationsTab = ({ investigations }) => {
+const InvestigationsTab = ({ investigations: propInvestigations }) => {
+  const [investigations, setInvestigations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchInvestigations = async () => {
+      try {
+        setLoading(true);
+        const data = await investigationsService.getInvestigations();
+        setInvestigations(data || []);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch investigations:", err);
+        setError("Failed to load investigations. Please try again.");
+        // Fallback to prop data if API fails
+        if (propInvestigations && propInvestigations.length > 0) {
+          setInvestigations(propInvestigations);
+        }
+        toast.error("Failed to load investigations from the server");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchInvestigations();
+  }, [propInvestigations]);
+
   const getStatusColor = (status) => {
     switch(status) {
       case 'urgent':
@@ -18,6 +47,39 @@ const InvestigationsTab = ({ investigations }) => {
         return 'text-gray-500 bg-gray-100';
     }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Active Investigations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center py-8">
+            <div className="h-8 w-8 rounded-full border-2 border-primary border-r-transparent animate-spin"></div>
+            <p className="ml-3">Loading investigations...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error && !investigations.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Active Investigations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

@@ -1,12 +1,13 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "../ui/button";
 import NotificationDropdown from './NotificationDropdown';
 import { useAuth } from '../../contexts/AuthContext';
 
-const AdminHeader = ({ alerts }) => {
+const AdminHeader = () => {
   const { logout } = useAuth();
+  const [alerts, setAlerts] = useState([]);
 
   return (
     <div className="flex justify-between items-center mb-6">

@@ -4,26 +4,52 @@ import { Bell, BellDot } from 'lucide-react';
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { toast } from "sonner";
+import { notificationsService } from "../../services/notificationsService";
 
 const NotificationDropdown = ({ alerts = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
-    // Update notifications when alerts change
-    if (alerts && alerts.length > 0) {
-      const formattedNotifications = alerts.map(alert => ({
-        ...alert,
-        read: false,
-        timestamp: new Date().toISOString()
-      }));
+  // Fetch notifications from the backend
+  const fetchNotifications = async () => {
+    try {
+      setIsLoading(true);
+      const data = await notificationsService.getNotifications();
+      setNotifications(data || []);
       
-      setNotifications(formattedNotifications);
-      setUnreadCount(formattedNotifications.length);
+      // Count unread notifications
+      const unread = data ? data.filter(notification => !notification.read).length : 0;
+      setUnreadCount(unread);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      // If API fails, fallback to the provided alerts prop
+      if (alerts && alerts.length > 0) {
+        const formattedNotifications = alerts.map(alert => ({
+          ...alert,
+          read: false,
+          timestamp: new Date().toISOString()
+        }));
+        
+        setNotifications(formattedNotifications);
+        setUnreadCount(formattedNotifications.length);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, [alerts]);
+  };
+
+  useEffect(() => {
+    // Fetch notifications when the component mounts
+    fetchNotifications();
+    
+    // Set up a polling interval to check for new notifications
+    const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Handle clicks outside the dropdown to close it
@@ -43,24 +69,38 @@ const NotificationDropdown = ({ alerts = [] }) => {
     setIsOpen(!isOpen);
   };
 
-  const markAllAsRead = () => {
-    const updatedNotifications = notifications.map(notification => ({
-      ...notification,
-      read: true
-    }));
-    
-    setNotifications(updatedNotifications);
-    setUnreadCount(0);
-    toast.success("All notifications marked as read");
+  const markAllAsRead = async () => {
+    try {
+      await notificationsService.markAllAsRead();
+      
+      const updatedNotifications = notifications.map(notification => ({
+        ...notification,
+        read: true
+      }));
+      
+      setNotifications(updatedNotifications);
+      setUnreadCount(0);
+      toast.success("All notifications marked as read");
+    } catch (error) {
+      console.error("Failed to mark all as read:", error);
+      toast.error("Failed to mark notifications as read. Please try again.");
+    }
   };
 
-  const markAsRead = (id) => {
-    const updatedNotifications = notifications.map(notification => 
-      notification.id === id ? { ...notification, read: true } : notification
-    );
-    
-    setNotifications(updatedNotifications);
-    setUnreadCount(prev => Math.max(prev - 1, 0));
+  const markAsRead = async (id) => {
+    try {
+      await notificationsService.markAsRead(id);
+      
+      const updatedNotifications = notifications.map(notification => 
+        notification.id === id ? { ...notification, read: true } : notification
+      );
+      
+      setNotifications(updatedNotifications);
+      setUnreadCount(prev => Math.max(prev - 1, 0));
+    } catch (error) {
+      console.error(`Failed to mark notification ${id} as read:`, error);
+      toast.error("Failed to update notification status. Please try again.");
+    }
   };
 
   const formatTimestamp = (timestamp) => {
@@ -76,7 +116,9 @@ const NotificationDropdown = ({ alerts = [] }) => {
         onClick={toggleDropdown}
         aria-label="Notifications"
       >
-        {unreadCount > 0 ? (
+        {isLoading ? (
+          <span className="h-5 w-5 block rounded-full border-2 border-current border-r-transparent animate-spin" />
+        ) : unreadCount > 0 ? (
           <>
             <BellDot className="h-5 w-5" />
             <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
@@ -105,7 +147,12 @@ const NotificationDropdown = ({ alerts = [] }) => {
           </div>
           
           <div className="max-h-96 overflow-y-auto">
-            {notifications.length > 0 ? (
+            {isLoading ? (
+              <div className="p-5 text-center">
+                <span className="inline-block h-6 w-6 rounded-full border-2 border-current border-r-transparent animate-spin"></span>
+                <p className="mt-2 text-sm text-gray-500">Loading notifications...</p>
+              </div>
+            ) : notifications.length > 0 ? (
               notifications.map((notification) => (
                 <div 
                   key={notification.id}
