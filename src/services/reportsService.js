@@ -1,4 +1,3 @@
-
 import { post, get, put, del } from '../utils/api';
 
 export const reportsService = {
@@ -118,6 +117,33 @@ export const reportsService = {
       return await get(`/reports/${reportId}/comments`);
     } catch (error) {
       console.error(`Failed to fetch comments for report ${reportId}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Submit report to threat database
+   */
+  submitToThreatDatabase: async (reportData) => {
+    try {
+      // This would be your actual API endpoint
+      const response = await post('/api/threat-stream', {
+        ...reportData,
+        timestamp: new Date().toISOString(),
+        source: 'unmask-protocol',
+        threatType: 'web3-scam',
+        // Add any additional fields required by your Fortress data layer
+      });
+
+      // Also submit to RugHunter AI endpoint
+      await post('/api/rughunter/federated-learning', {
+        reportData,
+        modelUpdate: true,
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Failed to submit to threat database:', error);
       throw error;
     }
   }

@@ -40,12 +40,16 @@ const ReportForm = () => {
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, this would call the API
+      // Submit report to main system
       await reportsService.submitReport(formData);
       
+      // Submit to threat database and RugHunter AI
+      await reportsService.submitToThreatDatabase(formData);
+      
       toast.success("Report submitted successfully", {
-        description: "Your report will be reviewed by our investigation team."
+        description: "Your report has been submitted to our investigation team and threat database."
       });
+      
       setFormData({
         projectName: "",
         websiteUrl: "",

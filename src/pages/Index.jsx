@@ -1,29 +1,24 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, AlertTriangle, BadgeCheck } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { ThemeToggle } from '../components/ThemeToggle';
 
-// Performance monitoring component
 const PerformanceMonitor = () => {
   React.useEffect(() => {
-    // Report Web Vitals
     const reportWebVitals = () => {
       if (window.performance && window.performance.timing) {
         const t = window.performance.timing;
         
-        // DOMContentLoaded time
         const domLoaded = t.domContentLoadedEventEnd - t.navigationStart;
         console.log(`DOM Content Loaded: ${domLoaded}ms`);
         
-        // Total page load time
         const pageLoad = t.loadEventEnd - t.navigationStart;
         console.log(`Page Load Time: ${pageLoad}ms`);
       }
     };
 
-    // Run after the page has fully loaded
     window.addEventListener('load', reportWebVitals);
     
     return () => {
@@ -31,21 +26,25 @@ const PerformanceMonitor = () => {
     };
   }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 const Index = () => {
   return (
     <>
-      {/* Hidden performance monitor */}
       <PerformanceMonitor />
       
       <div className="container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Unmask Protocol</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Bringing transparency and trust to the Web3 ecosystem through verified identities and scam reporting
-          </p>
+        <header className="flex justify-between items-center mb-12">
+          <div className="flex items-center gap-4">
+            <img 
+              src="/company-logo.svg" 
+              alt="Company Logo" 
+              className="h-12 w-auto dark:invert" 
+            />
+            <h1 className="text-4xl font-bold">Unmask Protocol</h1>
+          </div>
+          <ThemeToggle />
         </header>
 
         <div className="grid md:grid-cols-2 gap-6 mb-12">

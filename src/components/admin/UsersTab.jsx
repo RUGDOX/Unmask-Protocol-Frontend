@@ -1,15 +1,24 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
-import { AlertCircle, Users, Shield } from "lucide-react";
+import { AlertCircle, Users, Shield, Trash2, Moon, Sun } from "lucide-react";
 import { useToast } from "../../components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog";
 
 const UsersTab = ({ users, setUsers }) => {
   const { toast } = useToast();
   const [newUser, setNewUser] = useState({ username: '', email: '', role: '' });
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const handleCreateUser = async () => {
     if (!newUser.username || !newUser.email || !newUser.role) {
@@ -56,6 +65,24 @@ const UsersTab = ({ users, setUsers }) => {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    try {
+      setUsers(users.filter(user => user.id !== userId));
+      setUserToDelete(null);
+      
+      toast({
+        title: "User Deleted",
+        description: "User has been removed from the system",
+      });
+    } catch (err) {
+      toast({
+        title: "Error Deleting User",
+        description: err.message || "An error occurred",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -95,14 +122,44 @@ const UsersTab = ({ users, setUsers }) => {
                     <div className="font-semibold">{user.username}</div>
                     <div className="text-sm text-gray-500">{user.email} - {user.role}</div>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleVerifyUser(user.username, user.id)}
-                  >
-                    <Shield className="mr-2 h-4 w-4" />
-                    Verify
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleVerifyUser(user.username, user.id)}
+                    >
+                      <Shield className="mr-2 h-4 w-4" />
+                      Verify
+                    </Button>
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => setUserToDelete(user)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Delete User</DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to delete {user.username}? This action cannot be undone.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setUserToDelete(null)}>
+                            Cancel
+                          </Button>
+                          <Button variant="destructive" onClick={() => handleDeleteUser(user.id)}>
+                            Delete
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               ))
             ) : (
