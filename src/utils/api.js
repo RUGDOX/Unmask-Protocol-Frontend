@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for API requests
  */
@@ -217,4 +216,3 @@ setupOfflineDetection();
 
 // Export cache utilities
 export { clearCache };
-

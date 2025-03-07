@@ -20,7 +20,10 @@ if (rootElement) {
   // Hide loading screen after rendering
   const loadingScreen = document.getElementById('loading-screen');
   if (loadingScreen) {
-    loadingScreen.style.display = 'none';
+    // Use a slight delay to ensure content is rendered
+    setTimeout(() => {
+      loadingScreen.style.display = 'none';
+    }, 500);
   }
 } else {
   console.error("Could not find root element");

@@ -7,7 +7,17 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center py-6">
       <div className="flex items-center gap-2">
-        <img src="/unmask-logo.png" alt="Unmask Protocol Logo" className="h-8 w-8" />
+        <img 
+          src="/unmask-logo.png" 
+          alt="Unmask Protocol Logo" 
+          className="h-8 w-8"
+          onError={(e) => {
+            // Fallback to SVG if PNG is not found
+            e.target.onerror = null;
+            e.target.src = "/unmask-logo.svg";
+            console.log("Logo fallback to SVG");
+          }}
+        />
         <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
       </div>
       
