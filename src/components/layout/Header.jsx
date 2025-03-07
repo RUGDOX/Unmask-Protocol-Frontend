@@ -5,7 +5,7 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center mb-12">
       <div className="flex items-center gap-4">
-        <h1 className="text-4xl font-bold">Unmask Protocol</h1>
+        <h1 className="text-2xl font-bold">Unmask Protocol</h1>
       </div>
     </header>
   );

@@ -5,13 +5,11 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
 
-// Get the root element
-const root = document.getElementById("root");
+// Simple, reliable initialization
+const rootElement = document.getElementById("root");
 
-// Create and render the app
-if (root) {
-  const reactRoot = ReactDOM.createRoot(root);
-  reactRoot.render(
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
     <BrowserRouter>
       <App />
     </BrowserRouter>
