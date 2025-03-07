@@ -2,8 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Shield, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
-import GlitchingGlobe from '../components/visualization/GlitchingGlobe';
+import { Shield, AlertTriangle, CheckCircle, Zap, BarChart3, Eye, Lock, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -31,7 +30,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* New section between Hero and Features */}
+        {/* New section between Hero and Features - REMOVED BUTTON */}
         <section className="mb-16 relative">
           <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2 order-2 md:order-1">
@@ -42,9 +41,6 @@ const Index = () => {
               <p className="text-xl font-semibold mb-4">
                 Expose deception. Enforce accountability. Protect Web3.
               </p>
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-700 hover:from-purple-700 hover:to-blue-800 shadow-glow mt-2">
-                Explore Features
-              </Button>
             </div>
             <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center">
               <div className="pulse-subtle">
@@ -84,34 +80,93 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* How It Works - REDESIGNED SECTION */}
         <section className="mb-16 relative z-10">
-          <div className="blockchain-visualization glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
+          <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <h2 className="text-3xl font-bold mb-6 text-center text-gradient">Exposing Bad Actors in Web3</h2>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="w-full md:w-1/2">
-                <ol className="space-y-4 list-decimal pl-5">
-                  <li className="text-lg">
-                    <span className="font-semibold">Verify with Confidence</span> — Project founders complete a secure identity check, ensuring transparency without exposing sensitive information.
-                  </li>
-                  <li className="text-lg">
-                    <span className="font-semibold">Encrypted Data Storage</span> — Personal data is encrypted and stored securely in the FORTRESS layer.
-                  </li>
-                  <li className="text-lg">
-                    <span className="font-semibold">Fraud Reporting Workflow</span> — Users can submit verified fraud reports backed by encrypted evidence for review.
-                  </li>
-                  <li className="text-lg">
-                    <span className="font-semibold">Real-Time Alerts</span> — Users and platforms receive instant notifications when threats are detected.
-                  </li>
-                </ol>
-                <p className="mt-4 text-lg">
-                  Unmask Protocol thrives on its own — but when paired with RugHunter's live threat detection system, Web3 becomes a safer place for everyone.
-                </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left side - Steps */}
+              <div className="space-y-6">
+                <StepCard 
+                  number="01"
+                  icon={<Eye className="h-8 w-8 text-blue-400" />}
+                  title="Verify with Confidence"
+                  description="Project founders complete a secure identity check, ensuring transparency without exposing sensitive information."
+                />
+                
+                <StepCard 
+                  number="02"
+                  icon={<Lock className="h-8 w-8 text-purple-400" />}
+                  title="Encrypted Data Storage"
+                  description="Personal data is encrypted and stored securely in the FORTRESS data layer."
+                />
+                
+                <StepCard 
+                  number="03"
+                  icon={<AlertTriangle className="h-8 w-8 text-orange-400" />}
+                  title="Fraud Reporting Workflow"
+                  description="Users can submit verified fraud reports backed by encrypted evidence for review."
+                />
+                
+                <StepCard 
+                  number="04"
+                  icon={<Bell className="h-8 w-8 text-yellow-400" />}
+                  title="Real-Time Alerts"
+                  description="Users and platforms receive instant notifications when threats are detected."
+                />
               </div>
-              <div className="w-full md:w-1/2 h-64 rounded-lg overflow-hidden">
-                <GlitchingGlobe />
+              
+              {/* Right side - Visual Element */}
+              <div className="flex items-center justify-center">
+                <div className="relative w-full max-w-md aspect-square">
+                  {/* Cyber security visual */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/30 to-purple-600/30 animate-pulse-slow"></div>
+                  
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="relative w-3/4 h-3/4">
+                      {/* Inner circle with network visual */}
+                      <div className="absolute inset-0 rounded-full border-2 border-blue-500/40 flex items-center justify-center">
+                        <BarChart3 className="w-16 h-16 text-blue-400" />
+                      </div>
+                      
+                      {/* Orbiting elements */}
+                      <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '15s' }}>
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                          <div className="bg-purple-500 w-4 h-4 rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '20s', animationDirection: 'reverse' }}>
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
+                          <div className="bg-green-500 w-3 h-3 rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '12s' }}>
+                        <div className="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                          <div className="bg-yellow-500 w-5 h-5 rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}>
+                        <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2">
+                          <div className="bg-blue-500 w-4 h-4 rounded-full"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Outer ring with pulsing effect */}
+                  <div className="absolute inset-0 rounded-full border-4 border-indigo-500/20 animate-pulse" style={{ animationDuration: '3s' }}></div>
+                </div>
               </div>
             </div>
+            
+            {/* Bottom text */}
+            <p className="mt-8 text-lg text-center">
+              Unmask Protocol thrives on its own — but when paired with RugHunter's live threat detection system, Web3 becomes a safer place for everyone.
+            </p>
           </div>
         </section>
 
@@ -168,6 +223,22 @@ const FeatureCard = ({ icon, title, description }) => (
     <div className="mb-4 animate-float">{icon}</div>
     <h3 className="text-xl font-semibold mb-2">{title}</h3>
     <p className="text-gray-400">{description}</p>
+  </div>
+);
+
+// Step card component for the workflow section
+const StepCard = ({ number, icon, title, description }) => (
+  <div className="flex gap-4 p-4 rounded-lg border border-blue-500/10 bg-gray-900/40 hover:bg-gray-900/60 transition-all duration-300">
+    <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-gray-800 border border-blue-500/20">
+      {icon}
+    </div>
+    <div>
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-xs font-bold text-blue-400 opacity-70">STEP {number}</span>
+        <h3 className="text-lg font-semibold">{title}</h3>
+      </div>
+      <p className="text-gray-400 text-sm">{description}</p>
+    </div>
   </div>
 );
 
