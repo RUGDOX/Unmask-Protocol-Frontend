@@ -19,8 +19,7 @@ const Header = () => {
           alt="Unmask Protocol Logo" 
           className="h-8 w-8"
           onError={(e) => {
-            // Fallback to SVG if PNG is not found
-            e.target.onerror = null;
+            e.target.onerror = null; // Prevent infinite error loop
             e.target.src = "/unmask-logo.svg";
             console.log("Logo fallback to SVG");
           }}

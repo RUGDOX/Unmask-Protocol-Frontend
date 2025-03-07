@@ -1,7 +1,5 @@
 
 import React from 'react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
 import { Button } from '../components/ui/button';
 import { Shield, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 
@@ -9,7 +7,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="container mx-auto px-4 py-8">
-        <Header />
+        {/* Removed the Header import and rendering here since it's already in App.jsx */}
         
         <main className="py-8">
           {/* Hero Section */}
@@ -63,7 +61,7 @@ const Index = () => {
           </section>
         </main>
 
-        <Footer />
+        {/* Also removed Footer import and rendering, as it's in App.jsx */}
       </div>
     </div>
   );
