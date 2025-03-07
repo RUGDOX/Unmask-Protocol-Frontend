@@ -5,15 +5,11 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
 
-// Simple and reliable initialization
+// Direct initialization without error-prone wrappers
 const rootElement = document.getElementById("root");
 
-if (!rootElement) {
-  console.error("Fatal: Could not find root element!");
-} else {
-  const root = ReactDOM.createRoot(rootElement);
-  
-  root.render(
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <BrowserRouter>
         <App />
@@ -26,4 +22,6 @@ if (!rootElement) {
   if (loadingScreen) {
     loadingScreen.style.display = 'none';
   }
+} else {
+  console.error("Fatal: Could not find root element!");
 }
