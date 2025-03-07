@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, AlertTriangle, BadgeCheck, Zap, Lock } from 'lucide-react';
@@ -35,8 +34,9 @@ const Index = () => {
   
   useEffect(() => {
     console.log("Index component mounted");
-    // Mark component as loaded after a short delay
-    const timer = setTimeout(() => {
+    
+    try {
+      // Mark component as loaded
       setIsLoaded(true);
       console.log("Index component marked as loaded");
       
@@ -49,17 +49,22 @@ const Index = () => {
           if (loadingScreen) loadingScreen.style.display = 'none';
         }, 500);
       }
-    }, 300);
-    
-    return () => clearTimeout(timer);
+    } catch (error) {
+      console.error("Error in Index component:", error);
+    }
   }, []);
+
+  // Debug render
+  console.log("Index rendering, isLoaded:", isLoaded);
 
   return (
     <>
       <PerformanceMonitor />
       
-      <div className={`min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-           style={{ transition: 'opacity 0.5s ease' }}>
+      <div 
+        className={`min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        style={{ transition: 'opacity 0.5s ease' }}
+      >
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-purple-950/30 pointer-events-none"></div>
         
         <div className="container relative mx-auto px-4 py-8">
@@ -68,10 +73,10 @@ const Index = () => {
               <img 
                 src="/unmask-logo.svg" 
                 alt="Unmask Protocol Logo" 
-                className="h-16 w-auto animate-float" 
+                className="h-16 w-auto" 
                 onError={(e) => {
-                  console.error('Logo failed to load');
-                  e.target.src = '/placeholder.svg';
+                  console.error('Logo failed to load, using fallback');
+                  e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHBhdGggZD0iTTEwMCAwQzQ0LjggMCAwIDQ0LjggMCAxMDBDMCAxNTUuMiA0NC44IDIwMCAxMDAgMjAwQzE1NS4yIDIwMCAyMDAgMTU1LjIgMjAwIDEwMEMyMDAgNDQuOCAxNTUuMiAwIDEwMCAwWiIgZmlsbD0id2hpdGUiLz4KICA8cGF0aCBkPSJNNjUgMTI1QzY1IDExNS4xIDczLjEgMTA3IDgzIDEwN0gxMTdDMTI2LjkgMTA3IDEzNSAxMTUuMSAxMzUgMTI1VjE1NUgxNTVWMTI1QzE1NSAxMDQuMCAxMzguMCA4NyAxMTcgODdIODNDNjIuMCA4NyA0NSAxMDQuMCA0NSAxMjVWMTU1SDY1VjEyNVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPg==';
                 }}
                 onLoad={() => console.log('Logo loaded successfully')}
               />
@@ -211,6 +216,10 @@ const Index = () => {
                 src="/unmask-logo.svg" 
                 alt="Unmask Protocol Logo" 
                 className="h-10 w-auto opacity-50 hover:opacity-100 transition-opacity" 
+                onError={(e) => {
+                  console.error('Footer logo failed to load');
+                  e.target.style.display = 'none';
+                }}
               />
             </div>
             <p>© {new Date().getFullYear()} Unmask Protocol. Securing the Web3 ecosystem.</p>

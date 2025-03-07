@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Eager load the Index page for faster initial load
 import Index from './pages/Index';
@@ -38,7 +39,7 @@ function App() {
   }, []);
   
   return (
-    <>
+    <ErrorBoundary>
       <AuthProvider>
         <Suspense fallback={<PageLoader />}>
           <Routes>
@@ -65,7 +66,7 @@ function App() {
         </Suspense>
       </AuthProvider>
       <Toaster position="top-center" />
-    </>
+    </ErrorBoundary>
   );
 }
 

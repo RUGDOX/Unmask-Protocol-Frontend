@@ -12,6 +12,10 @@ console.log("Application initializing...");
 // Global error handler
 window.addEventListener('error', (event) => {
   console.error('Global error caught:', event.error);
+  // Log the element that caused the error if available
+  if (event.target && event.target.outerHTML) {
+    console.error('Error source element:', event.target.outerHTML.substring(0, 100));
+  }
 });
 
 // Mark the application start time
@@ -24,8 +28,15 @@ const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   console.error("Fatal: Could not find root element!");
+  document.body.innerHTML = `
+    <div style="padding: 20px; text-align: center;">
+      <h2>Application Error</h2>
+      <p>Could not find the root element. Please refresh the page or contact support.</p>
+    </div>
+  `;
 } else {
   try {
+    console.log("Mounting React app to root element:", rootElement);
     const root = ReactDOM.createRoot(rootElement);
     
     root.render(
