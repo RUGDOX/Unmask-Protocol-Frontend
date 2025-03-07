@@ -132,12 +132,6 @@ const GlitchingGlobe = () => {
         scene.add(line);
       }
       
-      // Subtle glitch effect timing variables - less frequent and less dramatic
-      let lastGlitchTime = 0;
-      let nextGlitchTime = Math.random() * 4000 + 5000; // Less frequent (5-9 seconds)
-      let isGlitching = false;
-      let glitchDuration = 0;
-      
       // Animation loop with better performance
       let animationFrameId;
       let lastFrameTime = 0;
@@ -153,42 +147,18 @@ const GlitchingGlobe = () => {
         if (currentTime - lastFrameTime < frameInterval) return;
         lastFrameTime = currentTime;
         
-        // Gentle rotation for a more sophisticated feel
-        particleSystem.rotation.y += 0.001;
-        wireframe.rotation.y -= 0.0005;
-        core.rotation.y += 0.0003;
+        // Gentle rotation for a more sophisticated feel - use continuous rotation pattern for perfect looping
+        // Use sine/cosine based movement for smooth looping animations
+        const time = currentTime * 0.001; // Convert to seconds
+
+        // Create smooth looping rotations using modulo of time
+        particleSystem.rotation.y = (time * 0.2) % (Math.PI * 2); 
+        wireframe.rotation.y = (time * -0.1) % (Math.PI * 2);
+        core.rotation.y = (time * 0.15) % (Math.PI * 2);
         
-        // Subtle axis tilt
-        particleSystem.rotation.x = Math.sin(Date.now() * 0.0001) * 0.05;
-        wireframe.rotation.x = Math.sin(Date.now() * 0.00015) * 0.05;
-        
-        // More refined glitch effect
-        const now = Date.now();
-        
-        if (!isGlitching && now - lastGlitchTime > nextGlitchTime) {
-          // Start glitching
-          isGlitching = true;
-          glitchDuration = Math.random() * 100 + 50; // Shorter duration (50-150ms)
-          lastGlitchTime = now;
-          
-          // Very subtle glitch effect - barely noticeable
-          particleSystem.scale.x += (Math.random() - 0.5) * 0.03;
-          particleSystem.scale.y += (Math.random() - 0.5) * 0.03;
-          particleSystem.position.x += (Math.random() - 0.5) * 0.02;
-          
-          // Use only theme colors for glitching
-          const themeColors = [0x0052FF, 0x8B5CF6, 0x14B8A6]; // blue, purple, cyan
-          particleMaterial.color.setHex(themeColors[Math.floor(Math.random() * themeColors.length)]);
-        } else if (isGlitching && now - lastGlitchTime > glitchDuration) {
-          // Stop glitching
-          isGlitching = false;
-          nextGlitchTime = Math.random() * 4000 + 5000;
-          
-          // Reset glitch effect
-          particleSystem.scale.set(1, 1, 1);
-          particleSystem.position.x = 0;
-          particleMaterial.color.setHex(0x0052FF); // Reset to default blue
-        }
+        // Subtle axis tilt with sine for perfect loops
+        particleSystem.rotation.x = Math.sin(time * 0.2) * 0.05;
+        wireframe.rotation.x = Math.sin(time * 0.3) * 0.05;
         
         if (mountRef.current) {
           renderer.render(scene, camera);
@@ -200,7 +170,8 @@ const GlitchingGlobe = () => {
         if (!isMounted) return;
         
         const t = Date.now() * 0.001;
-        const scale = 0.025 + Math.sin(t) * 0.005;
+        // Use sine wave for smooth looping pulse
+        const scale = 0.025 + Math.sin(t * 0.5) * 0.005;
         if (particleMaterial) {
           particleMaterial.size = scale;
         }
