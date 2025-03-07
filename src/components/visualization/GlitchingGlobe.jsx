@@ -49,31 +49,96 @@ const GlitchingGlobe = () => {
       // Create Earth texture loader with error handling
       const textureLoader = new THREE.TextureLoader();
       
-      // Use blue as base for oceans
+      // Load the Earth textures
+      const earthMap = textureLoader.load('./earth-map.jpg', undefined, undefined, (e) => {
+        console.log('Error loading texture', e);
+      });
+      
+      // If we don't have the map, use fallback colors
       const earthMaterial = new THREE.MeshPhongMaterial({
-        color: 0x0EA5E9, // Ocean blue
+        map: earthMap,
+        color: 0x0EA5E9, // Ocean blue (will blend with the texture if loaded)
         shininess: 25,
-        transparent: true,
-        opacity: 0.9
+        transparent: false,
+        bumpScale: 0.05
       });
       
       const earth = new THREE.Mesh(earthGeometry, earthMaterial);
       scene.add(earth);
       
-      // Add continent outlines using a wireframe overlay
+      // Create more pronounced continents
       const continentsGeometry = new THREE.SphereGeometry(1.01, 32, 32);
-      const continentsMaterial = new THREE.MeshBasicMaterial({
-        color: 0xF2FCE2, // Soft Green for land
-        wireframe: true,
-        transparent: true,
-        opacity: 0.35
+      
+      // Simplified continent areas using a custom pattern
+      // This creates a stylized version of Earth's continents
+      const continentsMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          color1: { value: new THREE.Color(0xF2FCE2) }, // Land color
+          color2: { value: new THREE.Color(0x0EA5E9) },  // Ocean color
+          time: { value: 0 }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 color1;
+          uniform vec3 color2;
+          uniform float time;
+          varying vec2 vUv;
+          
+          // Simple noise function
+          float random(vec2 st) {
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+          }
+          
+          // Continent-like pattern
+          float continentPattern(vec2 uv) {
+            // North America
+            if (uv.x < 0.35 && uv.y > 0.5 && uv.y < 0.85) return 1.0;
+            
+            // South America
+            if (uv.x < 0.35 && uv.x > 0.2 && uv.y > 0.15 && uv.y < 0.5) return 1.0;
+            
+            // Europe
+            if (uv.x > 0.45 && uv.x < 0.55 && uv.y > 0.6 && uv.y < 0.8) return 1.0;
+            
+            // Africa
+            if (uv.x > 0.45 && uv.x < 0.6 && uv.y > 0.35 && uv.y < 0.6) return 1.0;
+            
+            // Asia
+            if (uv.x > 0.55 && uv.x < 0.85 && uv.y > 0.5 && uv.y < 0.8) return 1.0;
+            
+            // Australia
+            if (uv.x > 0.75 && uv.x < 0.9 && uv.y > 0.25 && uv.y < 0.4) return 1.0;
+            
+            // Antarctica
+            if (uv.y < 0.20) return 1.0;
+            
+            return 0.0;
+          }
+          
+          void main() {
+            float pattern = continentPattern(vUv);
+            
+            // Add some noise to continent edges
+            float noise = random(vUv + time * 0.01) * 0.1;
+            pattern = smoothstep(0.4, 0.6, pattern + noise);
+            
+            gl_FragColor = vec4(mix(color2, color1, pattern), pattern * 0.7);
+          }
+        `,
+        transparent: true
       });
       
       const continents = new THREE.Mesh(continentsGeometry, continentsMaterial);
       scene.add(continents);
       
       // Add atmosphere glow
-      const atmosphereGeometry = new THREE.SphereGeometry(1.05, 64, 64);
+      const atmosphereGeometry = new THREE.SphereGeometry(1.1, 64, 64);
       const atmosphereMaterial = new THREE.MeshBasicMaterial({
         color: 0xD3E4FD, // Soft blue
         transparent: true,
@@ -144,13 +209,14 @@ const GlitchingGlobe = () => {
       }
       
       // Add some "data points" on the surface
-      const dataPointGeometry = new THREE.SphereGeometry(0.01, 8, 8);
+      const dataPointGeometry = new THREE.SphereGeometry(0.015, 8, 8);
       const dataPointMaterial = new THREE.MeshBasicMaterial({
         color: 0x14B8A6 // crypto.cyan
       });
       
-      // Create 25 random data points
-      for (let i = 0; i < 25; i++) {
+      // Create 20 random data points
+      const dataPoints = [];
+      for (let i = 0; i < 20; i++) {
         const dataPoint = new THREE.Mesh(dataPointGeometry, dataPointMaterial);
         
         // Random position on sphere
@@ -163,6 +229,33 @@ const GlitchingGlobe = () => {
         dataPoint.position.z = radius * Math.cos(phi);
         
         scene.add(dataPoint);
+        dataPoints.push({
+          mesh: dataPoint,
+          initialPos: dataPoint.position.clone(),
+          pulsePhase: Math.random() * Math.PI * 2
+        });
+      }
+      
+      // Create connections between nearby points
+      const connectionMaterial = new THREE.LineBasicMaterial({
+        color: 0x14B8A6, // Match data point color
+        transparent: true,
+        opacity: 0.3
+      });
+      
+      // Connect some random points with lines
+      for (let i = 0; i < 15; i++) {
+        const pointA = dataPoints[Math.floor(Math.random() * dataPoints.length)];
+        const pointB = dataPoints[Math.floor(Math.random() * dataPoints.length)];
+        
+        if (pointA !== pointB) {
+          const connectionGeometry = new THREE.BufferGeometry().setFromPoints([
+            pointA.mesh.position,
+            pointB.mesh.position
+          ]);
+          const connectionLine = new THREE.Line(connectionGeometry, connectionMaterial);
+          scene.add(connectionLine);
+        }
       }
       
       // Animation loop with better performance
@@ -180,18 +273,29 @@ const GlitchingGlobe = () => {
         if (currentTime - lastFrameTime < frameInterval) return;
         lastFrameTime = currentTime;
         
+        // Update shader time
+        if (continentsMaterial.uniforms.time) {
+          continentsMaterial.uniforms.time.value = currentTime * 0.0001;
+        }
+        
         // Gentle rotation for a more sophisticated feel
         const time = currentTime * 0.0001; // Convert to seconds, slow rotation
         
         // Create smooth looping rotations
-        earth.rotation.y = (time * 5) % (Math.PI * 2);
-        continents.rotation.y = (time * 5) % (Math.PI * 2);
-        atmosphere.rotation.y = (time * 4) % (Math.PI * 2);
+        earth.rotation.y = (time * 0.3) % (Math.PI * 2);
+        continents.rotation.y = (time * 0.3) % (Math.PI * 2);
+        atmosphere.rotation.y = (time * 0.25) % (Math.PI * 2);
         
         // Subtle axis tilt
         earth.rotation.x = 0.4; // Fixed Earth tilt
         continents.rotation.x = 0.4;
         atmosphere.rotation.x = 0.4;
+        
+        // Animate data points with a subtle pulse
+        dataPoints.forEach(point => {
+          const pulseScale = 1.0 + 0.15 * Math.sin(currentTime * 0.002 + point.pulsePhase);
+          point.mesh.scale.set(pulseScale, pulseScale, pulseScale);
+        });
         
         if (mountRef.current) {
           renderer.render(scene, camera);
@@ -247,6 +351,7 @@ const GlitchingGlobe = () => {
         dataPointGeometry.dispose();
         dataPointMaterial.dispose();
         gridMaterial.dispose();
+        connectionMaterial.dispose();
         renderer.dispose();
       };
     } catch (error) {
