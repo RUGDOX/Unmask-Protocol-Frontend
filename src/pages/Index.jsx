@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Shield, AlertTriangle, CheckCircle, Zap, BarChart3, Eye, Lock, Bell } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Zap, BarChart3, Eye, Lock, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -16,11 +15,11 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-indigo-950/30 to-purple-950/40 pointer-events-none z-0"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Hero Section with binary particles */}
+        {/* Hero Section with binary particles - REDUCED TEXT SIZE */}
         <section className="text-center mb-12 relative">
           <div className="binary-particles-bg glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
-            <h1 className="text-4xl font-bold mb-4 text-gradient">Unmask the Threats. Secure Your Future.</h1>
-            <p className="text-xl mb-6 max-w-3xl mx-auto">
+            <h1 className="text-3xl font-bold mb-4 text-gradient">Unmask the Threats. Secure Your Future.</h1>
+            <p className="text-lg mb-6 max-w-3xl mx-auto">
               In Web3, trust is everything — but scams and fraud put that trust at risk. The Unmask Protocol is your digital ally, providing powerful tools for identity verification, fraud reporting, and secure evidence storage — all backed by the robust FORTRESS data layer.
             </p>
             <div className="flex justify-center gap-4 mt-6">
@@ -30,21 +29,21 @@ const Index = () => {
           </div>
         </section>
 
-        {/* New section between Hero and Features - REMOVED BUTTON */}
+        {/* New section between Hero and Features - REPLACED SHIELD WITH RUGHUNTER LOGO & REDUCED TEXT SIZE */}
         <section className="mb-16 relative">
-          <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow flex flex-col md:flex-row items-center gap-8">
-            <div className="w-full md:w-1/2 order-2 md:order-1">
-              <h2 className="text-2xl font-bold mb-4 text-gradient">Your Shield in the Web3 Landscape</h2>
-              <p className="text-lg mb-4">
+          <div className="glass-morph p-6 rounded-lg border border-blue-500/20 shadow-glow flex flex-col md:flex-row items-center gap-8">
+            <div className="w-full md:w-2/3 order-2 md:order-1">
+              <h2 className="text-xl font-bold mb-3 text-gradient">Your Shield in the Web3 Landscape</h2>
+              <p className="text-base mb-3">
                 Unmask Protocol works independently — but when combined with RugHunter, it becomes part of a powerful network built to stop Web3 scams in their tracks.
               </p>
-              <p className="text-xl font-semibold mb-4">
+              <p className="text-lg font-semibold">
                 Expose deception. Enforce accountability. Protect Web3.
               </p>
             </div>
-            <div className="w-full md:w-1/2 order-1 md:order-2 flex justify-center">
+            <div className="w-full md:w-1/3 order-1 md:order-2 flex justify-center">
               <div className="pulse-subtle">
-                <Shield className="h-32 w-32 text-blue-500" />
+                <img src="/unmask-logo-main.png" alt="RugHunter Logo" className="h-20 w-auto" />
               </div>
             </div>
           </div>
@@ -58,7 +57,7 @@ const Index = () => {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <FeatureCard 
-              icon={<Shield className="h-10 w-10 text-blue-500" />}
+              icon={<Eye className="h-10 w-10 text-blue-500" />}
               title="Identity Verification"
               description="Ensure project founders are verified without compromising privacy."
             />
