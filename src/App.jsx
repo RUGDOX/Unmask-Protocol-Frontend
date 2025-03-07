@@ -11,6 +11,7 @@ import RugIdSearchPage from './pages/RugIdSearchPage';
 import ReportingPage from './pages/ReportingPage';
 import ProjectRegistrationPage from './pages/ProjectRegistrationPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="/report" element={<ReportingPage />} />
               <Route path="/register" element={<ProjectRegistrationPage />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="*" element={<div className="py-20 text-center"><h1 className="text-3xl font-bold">Page Not Found</h1><p className="mt-4">The page you are looking for does not exist.</p></div>} />
             </Routes>
           </main>

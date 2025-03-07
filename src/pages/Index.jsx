@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Shield, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 
@@ -17,7 +18,7 @@ const Index = () => {
             </p>
             <div className="flex justify-center gap-4 mt-8">
               <Button className="bg-blue-600 hover:bg-blue-700">Get Started</Button>
-              <Button variant="outline" className="border-blue-500 text-blue-500">Learn More</Button>
+              <Button variant="outline" className="border-blue-500 text-blue-500" as={Link} to="/about">Learn More</Button>
             </div>
           </section>
 
@@ -54,9 +55,14 @@ const Index = () => {
             <p className="mb-6 max-w-2xl mx-auto">
               Join thousands of users who trust Unmask Protocol to safeguard their blockchain interactions and investments.
             </p>
-            <Button className="bg-blue-600 hover:bg-blue-700 pulse-subtle">
-              Start Scanning
-            </Button>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button className="bg-blue-600 hover:bg-blue-700 pulse-subtle">
+                Start Scanning
+              </Button>
+              <Button variant="outline" className="border-blue-500 text-blue-500" as={Link} to="/about">
+                About Unmask Protocol
+              </Button>
+            </div>
           </section>
         </main>
 
