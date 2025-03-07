@@ -9,7 +9,17 @@ const Footer = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Shield className="h-5 w-5 text-blue-500" />
+            <img 
+              src="/unmask-logo.png" 
+              alt="Unmask Protocol Logo" 
+              className="h-8 w-8 object-contain"
+              onError={(e) => {
+                e.target.onerror = null; // Prevent infinite error loop
+                console.log("Logo PNG failed to load");
+                // Use SVG as fallback
+                e.target.src = '/unmask-logo.svg';
+              }}
+            />
             <span className="text-xl font-bold">Unmask Protocol</span>
           </div>
           <p className="text-gray-400 mb-4">

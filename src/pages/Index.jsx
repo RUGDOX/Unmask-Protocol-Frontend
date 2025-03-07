@@ -12,7 +12,6 @@ const Index = () => {
         <main className="py-8">
           {/* Hero Section */}
           <section className="text-center mb-16 glow-effect">
-            <h1 className="text-5xl font-bold mb-6 text-gradient">Unmask Protocol</h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
               Advanced blockchain security platform for detecting scams, verifying projects, and protecting users in the crypto ecosystem.
             </p>
