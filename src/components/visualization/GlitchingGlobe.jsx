@@ -16,7 +16,10 @@ const GlitchingGlobe = () => {
     try {
       // Scene setup
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+      
+      // Maintain aspect ratio
+      const aspect = 1; // Force 1:1 aspect ratio for perfect sphere
+      const camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
       camera.position.z = 2.5;
       
       // Initialize renderer with better error handling
@@ -28,7 +31,11 @@ const GlitchingGlobe = () => {
       
       // Make sure the container exists before setting size
       if (mountRef.current) {
-        renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+        const containerWidth = mountRef.current.clientWidth;
+        const containerHeight = mountRef.current.clientHeight;
+        // Use the smaller dimension to maintain aspect ratio
+        const size = Math.min(containerWidth, containerHeight);
+        renderer.setSize(size, size);
         renderer.setClearColor(0x000000, 0);
         mountRef.current.appendChild(renderer.domElement);
       } else {
@@ -36,56 +43,98 @@ const GlitchingGlobe = () => {
         return;
       }
       
-      // Create globe geometry with more detail for a professional look
-      const globeGeometry = new THREE.SphereGeometry(1, 48, 48);
+      // Create a particle-based globe for tech look
+      const particleCount = 3000;
+      const particles = new THREE.BufferGeometry();
+      const positions = [];
       
-      // Create wireframe material with subtle colors from the theme
+      // Generate particles in a sphere pattern
+      for (let i = 0; i < particleCount; i++) {
+        // Use spherical distribution
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const radius = 1 + (Math.random() * 0.1 - 0.05); // Slight variation in radius
+        
+        const x = radius * Math.sin(phi) * Math.cos(theta);
+        const y = radius * Math.sin(phi) * Math.sin(theta);
+        const z = radius * Math.cos(phi);
+        
+        positions.push(x, y, z);
+      }
+      
+      particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      
+      // Use only theme colors, no orange
+      const particleMaterial = new THREE.PointsMaterial({
+        color: 0x0052FF, // crypto.blue
+        size: 0.025,
+        transparent: true,
+        opacity: 0.8,
+        sizeAttenuation: true
+      });
+      
+      const particleSystem = new THREE.Points(particles, particleMaterial);
+      scene.add(particleSystem);
+      
+      // Add a subtle wireframe sphere for structure
+      const wireframeGeometry = new THREE.SphereGeometry(0.99, 32, 32);
       const wireframeMaterial = new THREE.MeshBasicMaterial({
-        color: 0x0052FF, // Using crypto.blue from the theme
+        color: 0x8B5CF6, // crypto.purple
         wireframe: true,
         transparent: true,
-        opacity: 0.4
+        opacity: 0.15
       });
       
-      // Add second layer
-      const glowGeometry = new THREE.SphereGeometry(1.05, 48, 48);
-      const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8B5CF6, // Using crypto.purple from the theme
-        wireframe: true,
-        transparent: true,
-        opacity: 0.2
-      });
+      const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+      scene.add(wireframe);
       
-      // Add third particles layer
-      const particlesGeometry = new THREE.SphereGeometry(1.15, 24, 24);
-      const particlesMaterial = new THREE.PointsMaterial({
-        color: 0x14B8A6, // Using crypto.cyan from the theme
-        size: 0.03,
-        transparent: true,
-        opacity: 0.5
-      });
-      
-      // Add a subtle inner core for depth
-      const coreGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+      // Add inner core for depth
+      const coreGeometry = new THREE.SphereGeometry(0.85, 24, 24);
       const coreMaterial = new THREE.MeshBasicMaterial({
-        color: 0x0052FF, // Crypto.blue
+        color: 0x14B8A6, // crypto.cyan
         transparent: true,
         opacity: 0.1
       });
       
-      const globe = new THREE.Mesh(globeGeometry, wireframeMaterial);
-      const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-      const particles = new THREE.Points(particlesGeometry, particlesMaterial);
       const core = new THREE.Mesh(coreGeometry, coreMaterial);
-      
-      scene.add(globe);
-      scene.add(glow);
-      scene.add(particles);
       scene.add(core);
+      
+      // Add some connection lines for a network effect
+      const linesMaterial = new THREE.LineBasicMaterial({
+        color: 0x8B5CF6, // crypto.purple
+        transparent: true,
+        opacity: 0.2
+      });
+      
+      // Create 10 random connection lines
+      for (let i = 0; i < 10; i++) {
+        const lineGeometry = new THREE.BufferGeometry();
+        const linePoints = [];
+        
+        // Random start and end points on the sphere
+        const start = new THREE.Vector3(
+          Math.sin(Math.random() * Math.PI * 2) * Math.cos(Math.random() * Math.PI),
+          Math.sin(Math.random() * Math.PI * 2) * Math.sin(Math.random() * Math.PI),
+          Math.cos(Math.random() * Math.PI * 2)
+        ).normalize();
+        
+        const end = new THREE.Vector3(
+          Math.sin(Math.random() * Math.PI * 2) * Math.cos(Math.random() * Math.PI),
+          Math.sin(Math.random() * Math.PI * 2) * Math.sin(Math.random() * Math.PI),
+          Math.cos(Math.random() * Math.PI * 2)
+        ).normalize();
+        
+        linePoints.push(start.x, start.y, start.z);
+        linePoints.push(end.x, end.y, end.z);
+        
+        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePoints, 3));
+        const line = new THREE.Line(lineGeometry, linesMaterial);
+        scene.add(line);
+      }
       
       // Subtle glitch effect timing variables - less frequent and less dramatic
       let lastGlitchTime = 0;
-      let nextGlitchTime = Math.random() * 4000 + 3000; // Less frequent (3-7 seconds)
+      let nextGlitchTime = Math.random() * 4000 + 5000; // Less frequent (5-9 seconds)
       let isGlitching = false;
       let glitchDuration = 0;
       
@@ -105,14 +154,13 @@ const GlitchingGlobe = () => {
         lastFrameTime = currentTime;
         
         // Gentle rotation for a more sophisticated feel
-        globe.rotation.y += 0.002;
-        glow.rotation.y -= 0.001;
-        particles.rotation.y += 0.0005;
-        core.rotation.y -= 0.0008;
+        particleSystem.rotation.y += 0.001;
+        wireframe.rotation.y -= 0.0005;
+        core.rotation.y += 0.0003;
         
         // Subtle axis tilt
-        globe.rotation.x = Math.sin(Date.now() * 0.0003) * 0.1;
-        glow.rotation.x = Math.sin(Date.now() * 0.0002) * 0.1;
+        particleSystem.rotation.x = Math.sin(Date.now() * 0.0001) * 0.05;
+        wireframe.rotation.x = Math.sin(Date.now() * 0.00015) * 0.05;
         
         // More refined glitch effect
         const now = Date.now();
@@ -123,23 +171,23 @@ const GlitchingGlobe = () => {
           glitchDuration = Math.random() * 100 + 50; // Shorter duration (50-150ms)
           lastGlitchTime = now;
           
-          // Subtle glitch effect
-          globe.scale.x += (Math.random() - 0.5) * 0.05;
-          globe.scale.y += (Math.random() - 0.5) * 0.05;
-          globe.position.x += (Math.random() - 0.5) * 0.05;
+          // Very subtle glitch effect - barely noticeable
+          particleSystem.scale.x += (Math.random() - 0.5) * 0.03;
+          particleSystem.scale.y += (Math.random() - 0.5) * 0.03;
+          particleSystem.position.x += (Math.random() - 0.5) * 0.02;
           
           // Use only theme colors for glitching
           const themeColors = [0x0052FF, 0x8B5CF6, 0x14B8A6]; // blue, purple, cyan
-          wireframeMaterial.color.setHex(themeColors[Math.floor(Math.random() * themeColors.length)]);
+          particleMaterial.color.setHex(themeColors[Math.floor(Math.random() * themeColors.length)]);
         } else if (isGlitching && now - lastGlitchTime > glitchDuration) {
           // Stop glitching
           isGlitching = false;
-          nextGlitchTime = Math.random() * 4000 + 3000;
+          nextGlitchTime = Math.random() * 4000 + 5000;
           
           // Reset glitch effect
-          globe.scale.set(1, 1, 1);
-          globe.position.x = 0;
-          wireframeMaterial.color.setHex(0x0052FF); // Reset to default blue
+          particleSystem.scale.set(1, 1, 1);
+          particleSystem.position.x = 0;
+          particleMaterial.color.setHex(0x0052FF); // Reset to default blue
         }
         
         if (mountRef.current) {
@@ -147,14 +195,14 @@ const GlitchingGlobe = () => {
         }
       };
       
-      // Add a subtle pulse animation to the core for more depth
+      // Add a subtle pulse animation to particles
       const pulseCycle = () => {
         if (!isMounted) return;
         
         const t = Date.now() * 0.001;
-        const scale = 0.9 + Math.sin(t) * 0.05;
-        if (core) {
-          core.scale.set(scale, scale, scale);
+        const scale = 0.025 + Math.sin(t) * 0.005;
+        if (particleMaterial) {
+          particleMaterial.size = scale;
         }
         
         setTimeout(pulseCycle, 50);
@@ -172,7 +220,14 @@ const GlitchingGlobe = () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           if (mountRef.current && renderer) {
-            renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+            const containerWidth = mountRef.current.clientWidth;
+            const containerHeight = mountRef.current.clientHeight;
+            // Use the smaller dimension to maintain aspect ratio
+            const size = Math.min(containerWidth, containerHeight);
+            
+            renderer.setSize(size, size);
+            camera.aspect = 1; // Maintain 1:1 aspect ratio
+            camera.updateProjectionMatrix();
           }
         }, 100);
       };
@@ -195,12 +250,10 @@ const GlitchingGlobe = () => {
         }
         
         // Dispose of resources
-        globeGeometry.dispose();
+        particles.dispose();
+        particleMaterial.dispose();
+        wireframeGeometry.dispose();
         wireframeMaterial.dispose();
-        glowGeometry.dispose();
-        glowMaterial.dispose();
-        particlesGeometry.dispose();
-        particlesMaterial.dispose();
         coreGeometry.dispose();
         coreMaterial.dispose();
         renderer.dispose();
@@ -215,7 +268,7 @@ const GlitchingGlobe = () => {
   }, []);
   
   return (
-    <div ref={mountRef} className="w-full h-full relative">
+    <div ref={mountRef} className="w-full h-full relative flex items-center justify-center">
       {hasError && (
         <div className="absolute inset-0 flex items-center justify-center text-red-500">
           <p>Failed to load 3D visualization</p>
