@@ -1,36 +1,124 @@
 
-import { post, get, put } from '../utils/api';
+import { post, get, put, del } from '../utils/api';
 
 export const reportsService = {
   /**
    * Submit a new scam report
    */
-  submitReport: (reportData) => post('/reports', reportData),
+  submitReport: async (reportData) => {
+    try {
+      return await post('/reports', reportData);
+    } catch (error) {
+      console.error('Failed to submit report:', error);
+      throw error;
+    }
+  },
   
   /**
    * Get all reports (admin only)
    */
-  getReports: () => get('/reports'),
+  getReports: async () => {
+    try {
+      return await get('/reports');
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+      throw error;
+    }
+  },
   
   /**
    * Get report by ID (admin only)
    */
-  getReportById: (id) => get(`/reports/${id}`),
+  getReportById: async (id) => {
+    try {
+      return await get(`/reports/${id}`);
+    } catch (error) {
+      console.error(`Failed to fetch report ${id}:`, error);
+      throw error;
+    }
+  },
 
   /**
    * Link a report to an investigation
    */
-  linkReportToInvestigation: (reportId, investigationId) => 
-    put(`/reports/${reportId}/link`, { investigationId }),
+  linkReportToInvestigation: async (reportId, investigationId) => {
+    try {
+      return await put(`/reports/${reportId}/link`, { investigationId });
+    } catch (error) {
+      console.error(`Failed to link report ${reportId} to investigation ${investigationId}:`, error);
+      throw error;
+    }
+  },
   
   /**
    * Get reports that aren't linked to any investigation yet
    */
-  getUnlinkedReports: () => get('/reports/unlinked'),
+  getUnlinkedReports: async () => {
+    try {
+      return await get('/reports/unlinked');
+    } catch (error) {
+      console.error('Failed to fetch unlinked reports:', error);
+      throw error;
+    }
+  },
   
   /**
    * Get reports by investigation ID
    */
-  getReportsByInvestigation: (investigationId) => 
-    get(`/investigations/${investigationId}/reports`),
+  getReportsByInvestigation: async (investigationId) => {
+    try {
+      return await get(`/investigations/${investigationId}/reports`);
+    } catch (error) {
+      console.error(`Failed to fetch reports for investigation ${investigationId}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Update report status
+   */
+  updateReportStatus: async (reportId, status) => {
+    try {
+      return await put(`/reports/${reportId}/status`, { status });
+    } catch (error) {
+      console.error(`Failed to update report ${reportId} status:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Delete a report
+   */
+  deleteReport: async (reportId) => {
+    try {
+      return await del(`/reports/${reportId}`);
+    } catch (error) {
+      console.error(`Failed to delete report ${reportId}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Add comment to a report
+   */
+  addReportComment: async (reportId, comment) => {
+    try {
+      return await post(`/reports/${reportId}/comments`, { comment });
+    } catch (error) {
+      console.error(`Failed to add comment to report ${reportId}:`, error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Get comments for a report
+   */
+  getReportComments: async (reportId) => {
+    try {
+      return await get(`/reports/${reportId}/comments`);
+    } catch (error) {
+      console.error(`Failed to fetch comments for report ${reportId}:`, error);
+      throw error;
+    }
+  }
 };
