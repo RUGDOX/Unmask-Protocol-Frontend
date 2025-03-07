@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { AlertTriangle, CheckCircle, Zap, BarChart3, Eye, Lock, Bell } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Zap, FileText, Eye, Lock, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -19,7 +20,7 @@ const Index = () => {
         <section className="text-center mb-12 relative">
           <div className="binary-particles-bg glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <h1 className="text-3xl font-bold mb-4 text-gradient">Unmask the Threats. Secure Your Future.</h1>
-            <p className="text-lg mb-6 max-w-3xl mx-auto">
+            <p className="text-base mb-6 max-w-3xl mx-auto font-normal">
               In Web3, trust is everything — but scams and fraud put that trust at risk. The Unmask Protocol is your digital ally, providing powerful tools for identity verification, fraud reporting, and secure evidence storage — all backed by the robust FORTRESS data layer.
             </p>
             <div className="flex justify-center gap-4 mt-6">
@@ -29,21 +30,21 @@ const Index = () => {
           </div>
         </section>
 
-        {/* New section between Hero and Features - REPLACED SHIELD WITH RUGHUNTER LOGO & REDUCED TEXT SIZE */}
+        {/* New section between Hero and Features - REDUCED TEXT SIZE */}
         <section className="mb-16 relative">
           <div className="glass-morph p-6 rounded-lg border border-blue-500/20 shadow-glow flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-2/3 order-2 md:order-1">
               <h2 className="text-xl font-bold mb-3 text-gradient">Your Shield in the Web3 Landscape</h2>
-              <p className="text-base mb-3">
+              <p className="text-sm mb-3 font-normal">
                 Unmask Protocol works independently — but when combined with RugHunter, it becomes part of a powerful network built to stop Web3 scams in their tracks.
               </p>
-              <p className="text-lg font-semibold">
+              <p className="text-base font-semibold">
                 Expose deception. Enforce accountability. Protect Web3.
               </p>
             </div>
             <div className="w-full md:w-1/3 order-1 md:order-2 flex justify-center">
               <div className="pulse-subtle">
-                <img src="/unmask-logo-main.png" alt="RugHunter Logo" className="h-20 w-auto" />
+                <img src="/unmask-logo-main.png" alt="RugHunter Logo" className="h-16 w-auto" />
               </div>
             </div>
           </div>
@@ -79,13 +80,13 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works - REDESIGNED SECTION */}
+        {/* How It Works - UPDATED with corrected information */}
         <section className="mb-16 relative z-10">
           <div className="glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <h2 className="text-3xl font-bold mb-6 text-center text-gradient">Exposing Bad Actors in Web3</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Left side - Steps */}
+              {/* Left side - Steps with updated descriptions */}
               <div className="space-y-6">
                 <StepCard 
                   number="01"
@@ -97,26 +98,26 @@ const Index = () => {
                 <StepCard 
                   number="02"
                   icon={<Lock className="h-8 w-8 text-purple-400" />}
-                  title="Encrypted Data Storage"
-                  description="Personal data is encrypted and stored securely in the FORTRESS data layer."
+                  title="Hardened Data Protection"
+                  description="Personal data is stored in high-security data vaults with offensive protection measures."
                 />
                 
                 <StepCard 
                   number="03"
-                  icon={<AlertTriangle className="h-8 w-8 text-orange-400" />}
-                  title="Fraud Reporting Workflow"
-                  description="Users can submit verified fraud reports backed by encrypted evidence for review."
+                  icon={<FileText className="h-8 w-8 text-orange-400" />}
+                  title="Evidence Submission"
+                  description="Users submit scam/rug/fraud events with supporting evidence for thorough investigation."
                 />
                 
                 <StepCard 
                   number="04"
                   icon={<Bell className="h-8 w-8 text-yellow-400" />}
-                  title="Real-Time Alerts"
-                  description="Users and platforms receive instant notifications when threats are detected."
+                  title="Investigation & Alerts"
+                  description="Investigators evaluate evidence and confirm threats, triggering real-time alerts."
                 />
               </div>
               
-              {/* Right side - Visual Element */}
+              {/* Right side - Updated Visual Element with FileText icon instead of BarChart3 */}
               <div className="flex items-center justify-center">
                 <div className="relative w-full max-w-md aspect-square">
                   {/* Cyber security visual */}
@@ -124,12 +125,12 @@ const Index = () => {
                   
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative w-3/4 h-3/4">
-                      {/* Inner circle with network visual */}
+                      {/* Inner circle with updated visual */}
                       <div className="absolute inset-0 rounded-full border-2 border-blue-500/40 flex items-center justify-center">
-                        <BarChart3 className="w-16 h-16 text-blue-400" />
+                        <FileText className="w-16 h-16 text-blue-400" />
                       </div>
                       
-                      {/* Orbiting elements */}
+                      {/* Orbiting elements - kept as is */}
                       <div className="absolute w-full h-full animate-spin" style={{ animationDuration: '15s' }}>
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                           <div className="bg-purple-500 w-4 h-4 rounded-full"></div>
