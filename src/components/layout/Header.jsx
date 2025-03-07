@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
@@ -19,12 +18,6 @@ const Header = () => {
             src="/unmask-logo.png" 
             alt="Unmask Protocol Logo" 
             className="h-24 w-24 object-contain"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite error loop
-              console.log("Logo PNG failed to load");
-              // Use SVG as fallback
-              e.target.src = '/unmask-logo.svg';
-            }}
           />
         </Link>
       </div>

@@ -11,11 +11,6 @@ const Footer = () => {
               src="/unmask-logo.png" 
               alt="Unmask Protocol Logo" 
               className="h-6 w-6 object-contain"
-              onError={(e) => {
-                e.target.onerror = null; // Prevent infinite error loop
-                console.log("Footer logo PNG failed to load");
-                e.target.src = '/unmask-logo.svg';
-              }}
             />
             <span className="text-xl font-bold">Unmask Protocol</span>
           </div>
