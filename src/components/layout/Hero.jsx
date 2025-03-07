@@ -8,8 +8,7 @@ const Hero = () => {
         Blockchain Security Reimagined
       </h2>
       <p className="text-blue-100 max-w-2xl mx-auto text-lg">
-        Securing Web3 with advanced RugID verification, transparent reporting, 
-        and decentralized reputation management.
+        Securing Web3 with advanced technology.
       </p>
     </div>
   );

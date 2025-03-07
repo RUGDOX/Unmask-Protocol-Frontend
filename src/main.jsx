@@ -5,53 +5,42 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
 
-console.log("Application initializing...");
-
-// Create root with simplified error handling
+// Simple initialization
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   console.error("Fatal: Could not find root element!");
-  document.body.innerHTML = `
-    <div style="padding: 20px; text-align: center;">
-      <h2>Application Error</h2>
-      <p>Could not find the root element. Please refresh the page or contact support.</p>
-    </div>
-  `;
 } else {
   try {
-    console.log("Mounting React app to root element");
-    
-    const hideLoadingScreen = () => {
-      const loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.display = 'none';
-      }
-    };
-    
     const root = ReactDOM.createRoot(rootElement);
     
     root.render(
       <React.StrictMode>
         <BrowserRouter>
-          <App onLoad={hideLoadingScreen} />
+          <App />
         </BrowserRouter>
       </React.StrictMode>
     );
     
-    console.log("React app mounted successfully");
+    // Hide loading screen after rendering
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.style.display = 'none';
+    }
   } catch (error) {
     console.error("Error rendering React application:", error);
+    
+    // Hide loading screen on error
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
       loadingScreen.style.display = 'none';
     }
     
+    // Show basic error message
     document.body.innerHTML = `
       <div style="padding: 20px; text-align: center;">
         <h2>Application Error</h2>
-        <p>Sorry, there was a problem loading the application. Please try refreshing the page.</p>
-        <pre style="text-align: left; background: #333; color: #f88; padding: 10px; border-radius: 4px; max-width: 800px; margin: 20px auto; overflow: auto;">${error.message}</pre>
+        <p>Sorry, there was a problem loading the application.</p>
       </div>
     `;
   }
