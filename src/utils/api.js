@@ -147,7 +147,7 @@ async function fetchWithRetry(endpoint, options = {}, useCache = false, retries 
 /**
  * Clear cache for specific endpoint or all cache if no endpoint provided
  */
-export const clearCache = (endpoint = null) => {
+function clearCache(endpoint = null) {
   if (endpoint) {
     // Clear specific endpoint cache entries
     for (const key of apiCache.keys()) {
@@ -159,7 +159,7 @@ export const clearCache = (endpoint = null) => {
     // Clear entire cache
     apiCache.clear();
   }
-};
+}
 
 /**
  * GET request helper with optional caching
