@@ -43,93 +43,126 @@ const GlitchingGlobe = () => {
         return;
       }
       
-      // Create a particle-based globe for tech look
-      const particleCount = 3000;
-      const particles = new THREE.BufferGeometry();
-      const positions = [];
+      // Create Earth globe
+      const earthGeometry = new THREE.SphereGeometry(1, 64, 64);
       
-      // Generate particles in a sphere pattern
-      for (let i = 0; i < particleCount; i++) {
-        // Use spherical distribution
-        const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos(2 * Math.random() - 1);
-        const radius = 1 + (Math.random() * 0.1 - 0.05); // Slight variation in radius
-        
-        const x = radius * Math.sin(phi) * Math.cos(theta);
-        const y = radius * Math.sin(phi) * Math.sin(theta);
-        const z = radius * Math.cos(phi);
-        
-        positions.push(x, y, z);
-      }
+      // Create Earth texture loader with error handling
+      const textureLoader = new THREE.TextureLoader();
       
-      particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-      
-      // Use only theme colors, no orange
-      const particleMaterial = new THREE.PointsMaterial({
-        color: 0x0052FF, // crypto.blue
-        size: 0.025,
+      // Use blue as base for oceans
+      const earthMaterial = new THREE.MeshPhongMaterial({
+        color: 0x0EA5E9, // Ocean blue
+        shininess: 25,
         transparent: true,
-        opacity: 0.8,
-        sizeAttenuation: true
+        opacity: 0.9
       });
       
-      const particleSystem = new THREE.Points(particles, particleMaterial);
-      scene.add(particleSystem);
+      const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+      scene.add(earth);
       
-      // Add a subtle wireframe sphere for structure
-      const wireframeGeometry = new THREE.SphereGeometry(0.99, 32, 32);
-      const wireframeMaterial = new THREE.MeshBasicMaterial({
-        color: 0x8B5CF6, // crypto.purple
+      // Add continent outlines using a wireframe overlay
+      const continentsGeometry = new THREE.SphereGeometry(1.01, 32, 32);
+      const continentsMaterial = new THREE.MeshBasicMaterial({
+        color: 0xF2FCE2, // Soft Green for land
         wireframe: true,
         transparent: true,
-        opacity: 0.15
+        opacity: 0.35
       });
       
-      const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
-      scene.add(wireframe);
+      const continents = new THREE.Mesh(continentsGeometry, continentsMaterial);
+      scene.add(continents);
       
-      // Add inner core for depth
-      const coreGeometry = new THREE.SphereGeometry(0.85, 24, 24);
-      const coreMaterial = new THREE.MeshBasicMaterial({
-        color: 0x14B8A6, // crypto.cyan
+      // Add atmosphere glow
+      const atmosphereGeometry = new THREE.SphereGeometry(1.05, 64, 64);
+      const atmosphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0xD3E4FD, // Soft blue
         transparent: true,
-        opacity: 0.1
+        opacity: 0.15,
+        side: THREE.BackSide
       });
       
-      const core = new THREE.Mesh(coreGeometry, coreMaterial);
-      scene.add(core);
+      const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+      scene.add(atmosphere);
       
-      // Add some connection lines for a network effect
-      const linesMaterial = new THREE.LineBasicMaterial({
-        color: 0x8B5CF6, // crypto.purple
+      // Add ambient light
+      const ambientLight = new THREE.AmbientLight(0x555555);
+      scene.add(ambientLight);
+      
+      // Add directional light to simulate sun
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 3, 5);
+      scene.add(directionalLight);
+      
+      // Add subtle point light for highlights
+      const pointLight = new THREE.PointLight(0xffffff, 0.5);
+      pointLight.position.set(-5, -3, 2);
+      scene.add(pointLight);
+      
+      // Add "network" lines (longitude/latitude)
+      const gridMaterial = new THREE.LineBasicMaterial({
+        color: 0x8E9196, // Neutral gray
         transparent: true,
         opacity: 0.2
       });
       
-      // Create 10 random connection lines
-      for (let i = 0; i < 10; i++) {
-        const lineGeometry = new THREE.BufferGeometry();
-        const linePoints = [];
+      // Create longitude lines
+      for (let i = 0; i < 12; i++) {
+        const longitude = new THREE.BufferGeometry();
+        const points = [];
+        const angle = (i / 12) * Math.PI * 2;
         
-        // Random start and end points on the sphere
-        const start = new THREE.Vector3(
-          Math.sin(Math.random() * Math.PI * 2) * Math.cos(Math.random() * Math.PI),
-          Math.sin(Math.random() * Math.PI * 2) * Math.sin(Math.random() * Math.PI),
-          Math.cos(Math.random() * Math.PI * 2)
-        ).normalize();
+        for (let j = 0; j <= 180; j++) {
+          const phi = (j / 180) * Math.PI;
+          const x = Math.sin(phi) * Math.cos(angle);
+          const y = Math.cos(phi);
+          const z = Math.sin(phi) * Math.sin(angle);
+          points.push(new THREE.Vector3(x, y, z));
+        }
         
-        const end = new THREE.Vector3(
-          Math.sin(Math.random() * Math.PI * 2) * Math.cos(Math.random() * Math.PI),
-          Math.sin(Math.random() * Math.PI * 2) * Math.sin(Math.random() * Math.PI),
-          Math.cos(Math.random() * Math.PI * 2)
-        ).normalize();
-        
-        linePoints.push(start.x, start.y, start.z);
-        linePoints.push(end.x, end.y, end.z);
-        
-        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePoints, 3));
-        const line = new THREE.Line(lineGeometry, linesMaterial);
+        longitude.setFromPoints(points);
+        const line = new THREE.Line(longitude, gridMaterial);
         scene.add(line);
+      }
+      
+      // Create latitude lines
+      for (let i = 1; i < 6; i++) {
+        const latitude = new THREE.BufferGeometry();
+        const points = [];
+        const phi = (i / 6) * Math.PI;
+        
+        for (let j = 0; j <= 360; j++) {
+          const angle = (j / 360) * Math.PI * 2;
+          const x = Math.sin(phi) * Math.cos(angle);
+          const y = Math.cos(phi);
+          const z = Math.sin(phi) * Math.sin(angle);
+          points.push(new THREE.Vector3(x, y, z));
+        }
+        
+        latitude.setFromPoints(points);
+        const line = new THREE.Line(latitude, gridMaterial);
+        scene.add(line);
+      }
+      
+      // Add some "data points" on the surface
+      const dataPointGeometry = new THREE.SphereGeometry(0.01, 8, 8);
+      const dataPointMaterial = new THREE.MeshBasicMaterial({
+        color: 0x14B8A6 // crypto.cyan
+      });
+      
+      // Create 25 random data points
+      for (let i = 0; i < 25; i++) {
+        const dataPoint = new THREE.Mesh(dataPointGeometry, dataPointMaterial);
+        
+        // Random position on sphere
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const radius = 1.02;
+        
+        dataPoint.position.x = radius * Math.sin(phi) * Math.cos(theta);
+        dataPoint.position.y = radius * Math.sin(phi) * Math.sin(theta);
+        dataPoint.position.z = radius * Math.cos(phi);
+        
+        scene.add(dataPoint);
       }
       
       // Animation loop with better performance
@@ -147,39 +180,23 @@ const GlitchingGlobe = () => {
         if (currentTime - lastFrameTime < frameInterval) return;
         lastFrameTime = currentTime;
         
-        // Gentle rotation for a more sophisticated feel - use continuous rotation pattern for perfect looping
-        // Use sine/cosine based movement for smooth looping animations
-        const time = currentTime * 0.001; // Convert to seconds
-
-        // Create smooth looping rotations using modulo of time
-        particleSystem.rotation.y = (time * 0.2) % (Math.PI * 2); 
-        wireframe.rotation.y = (time * -0.1) % (Math.PI * 2);
-        core.rotation.y = (time * 0.15) % (Math.PI * 2);
+        // Gentle rotation for a more sophisticated feel
+        const time = currentTime * 0.0001; // Convert to seconds, slow rotation
         
-        // Subtle axis tilt with sine for perfect loops
-        particleSystem.rotation.x = Math.sin(time * 0.2) * 0.05;
-        wireframe.rotation.x = Math.sin(time * 0.3) * 0.05;
+        // Create smooth looping rotations
+        earth.rotation.y = (time * 5) % (Math.PI * 2);
+        continents.rotation.y = (time * 5) % (Math.PI * 2);
+        atmosphere.rotation.y = (time * 4) % (Math.PI * 2);
+        
+        // Subtle axis tilt
+        earth.rotation.x = 0.4; // Fixed Earth tilt
+        continents.rotation.x = 0.4;
+        atmosphere.rotation.x = 0.4;
         
         if (mountRef.current) {
           renderer.render(scene, camera);
         }
       };
-      
-      // Add a subtle pulse animation to particles
-      const pulseCycle = () => {
-        if (!isMounted) return;
-        
-        const t = Date.now() * 0.001;
-        // Use sine wave for smooth looping pulse
-        const scale = 0.025 + Math.sin(t * 0.5) * 0.005;
-        if (particleMaterial) {
-          particleMaterial.size = scale;
-        }
-        
-        setTimeout(pulseCycle, 50);
-      };
-      
-      pulseCycle();
       
       // Start animation loop
       animate(0);
@@ -221,12 +238,15 @@ const GlitchingGlobe = () => {
         }
         
         // Dispose of resources
-        particles.dispose();
-        particleMaterial.dispose();
-        wireframeGeometry.dispose();
-        wireframeMaterial.dispose();
-        coreGeometry.dispose();
-        coreMaterial.dispose();
+        earthGeometry.dispose();
+        earthMaterial.dispose();
+        continentsGeometry.dispose();
+        continentsMaterial.dispose();
+        atmosphereGeometry.dispose();
+        atmosphereMaterial.dispose();
+        dataPointGeometry.dispose();
+        dataPointMaterial.dispose();
+        gridMaterial.dispose();
         renderer.dispose();
       };
     } catch (error) {
