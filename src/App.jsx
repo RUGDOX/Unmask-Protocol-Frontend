@@ -1,5 +1,5 @@
 
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './contexts/AuthContext';
@@ -20,11 +20,23 @@ const AgentInvestigationPage = lazy(() => import('./pages/AgentInvestigationPage
 // Loading component for suspense fallback
 const PageLoader = () => (
   <div className="flex justify-center items-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <span className="ml-3 text-blue-400">Loading...</span>
   </div>
 );
 
 function App() {
+  useEffect(() => {
+    console.log('App component mounted');
+    
+    // Force dark mode
+    document.documentElement.classList.add('dark');
+    
+    return () => {
+      console.log('App component unmounted');
+    };
+  }, []);
+  
   return (
     <>
       <AuthProvider>
@@ -52,7 +64,7 @@ function App() {
           </Routes>
         </Suspense>
       </AuthProvider>
-      <Toaster />
+      <Toaster position="top-center" />
     </>
   );
 }

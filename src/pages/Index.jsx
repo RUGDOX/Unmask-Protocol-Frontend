@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, AlertTriangle, BadgeCheck, Zap, Lock } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ThemeToggle } from '../components/ThemeToggle';
 
 const PerformanceMonitor = () => {
-  React.useEffect(() => {
+  useEffect(() => {
     const reportWebVitals = () => {
       if (window.performance && window.performance.timing) {
         const t = window.performance.timing;
@@ -31,11 +31,35 @@ const PerformanceMonitor = () => {
 };
 
 const Index = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  useEffect(() => {
+    console.log("Index component mounted");
+    // Mark component as loaded after a short delay
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      console.log("Index component marked as loaded");
+      
+      // Hide the loading screen if it's still visible
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          if (loadingScreen) loadingScreen.style.display = 'none';
+        }, 500);
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <PerformanceMonitor />
       
-      <div className="min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid">
+      <div className={`min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+           style={{ transition: 'opacity 0.5s ease' }}>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-purple-950/30 pointer-events-none"></div>
         
         <div className="container relative mx-auto px-4 py-8">
@@ -45,6 +69,11 @@ const Index = () => {
                 src="/unmask-logo.svg" 
                 alt="Unmask Protocol Logo" 
                 className="h-16 w-auto animate-float" 
+                onError={(e) => {
+                  console.error('Logo failed to load');
+                  e.target.src = '/placeholder.svg';
+                }}
+                onLoad={() => console.log('Logo loaded successfully')}
               />
               <h1 className="text-4xl font-bold text-gradient">Unmask Protocol</h1>
             </div>

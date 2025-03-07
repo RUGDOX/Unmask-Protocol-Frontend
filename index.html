@@ -9,9 +9,88 @@
     <meta name="author" content="Unmask Protocol" />
     <meta property="og:image" content="/unmask-logo.svg" />
     <link rel="icon" type="image/svg+xml" href="/unmask-logo.svg" />
+    <style>
+      /* Initial loading styles */
+      body {
+        background-color: #000;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+      }
+      
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #000;
+        z-index: 9999;
+      }
+      
+      #loading-logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { opacity: 0.5; transform: scale(0.95); }
+        50% { opacity: 1; transform: scale(1.05); }
+        100% { opacity: 0.5; transform: scale(0.95); }
+      }
+      
+      #loading-text {
+        font-family: sans-serif;
+        font-size: 18px;
+        color: #3B82F6;
+      }
+      
+      .cyber-grid {
+        background-size: 50px 50px;
+        background-image: 
+          linear-gradient(to right, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+      }
+    </style>
   </head>
   <body>
+    <div id="loading-screen">
+      <img id="loading-logo" src="/unmask-logo.svg" alt="Unmask Protocol Logo" />
+      <div id="loading-text">Loading Unmask Protocol...</div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Hide loading screen when app is ready
+      window.addEventListener('load', function() {
+        console.log('Window loaded, hiding loading screen');
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+        }, 800);
+      });
+      
+      // Fallback in case the load event doesn't fire correctly
+      setTimeout(function() {
+        console.log('Fallback timeout triggered');
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen && loadingScreen.style.display !== 'none') {
+          loadingScreen.style.display = 'none';
+          console.log('Forced loading screen removal');
+        }
+      }, 5000);
+    </script>
   </body>
 </html>
