@@ -51,12 +51,18 @@
       #loading-text {
         font-size: 18px;
         color: #3B82F6;
+        margin-top: 20px;
       }
     </style>
   </head>
   <body>
     <div id="loading-screen">
-      <img id="loading-logo" src="/unmask-logo.png" alt="Unmask Protocol Logo" />
+      <img 
+        id="loading-logo" 
+        src="/unmask-logo.png" 
+        alt="Unmask Protocol Logo"
+        onerror="this.onerror=null; console.log('Loading logo failed'); this.style.background='#3B82F6'; this.style.borderRadius='50%';" 
+      />
       <div id="loading-text">Loading Unmask Protocol...</div>
     </div>
     <div id="root"></div>

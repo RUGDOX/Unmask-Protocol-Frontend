@@ -13,14 +13,17 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center py-6">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col items-center md:items-start">
         <img 
           src="/unmask-logo.png" 
           alt="Unmask Protocol Logo" 
-          className="h-8 w-8"
+          className="h-16 w-16 mb-2"
           onError={(e) => {
             e.target.onerror = null; // Prevent infinite error loop
             console.log("Logo PNG failed to load");
+            // Add a placeholder background to make it obvious when the logo is missing
+            e.target.style.background = "#3B82F6";
+            e.target.style.borderRadius = "50%";
           }}
         />
         <Link to="/" className="text-2xl font-bold text-gradient">Unmask Protocol</Link>
