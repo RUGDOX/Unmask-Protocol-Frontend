@@ -4,12 +4,9 @@ import { Toaster as Sonner } from "sonner";
 const Toaster = ({
   ...props
 }) => {
-  // Use dark theme by default, no need for theme switching
-  const theme = "dark";
-
   return (
     <Sonner
-      theme={theme}
+      theme="dark"
       className="toaster group"
       toastOptions={{
         classNames: {

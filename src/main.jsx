@@ -4,21 +4,10 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
-import "./utils/performance"; // Import performance monitoring
 
 console.log("Application initializing...");
 
-// Global error handler
-window.addEventListener('error', (event) => {
-  console.error('Global error caught:', event.error);
-  // Don't hide the loading screen on error
-  const loadingScreen = document.getElementById('loading-screen');
-  if (loadingScreen) {
-    loadingScreen.style.display = 'none';
-  }
-});
-
-// Create root with error handling
+// Create root with simplified error handling
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
@@ -33,15 +22,10 @@ if (!rootElement) {
   try {
     console.log("Mounting React app to root element");
     
-    // Hide loading screen on successful mount
     const hideLoadingScreen = () => {
       const loadingScreen = document.getElementById('loading-screen');
       if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => {
-          if (loadingScreen) loadingScreen.style.display = 'none';
-        }, 500);
+        loadingScreen.style.display = 'none';
       }
     };
     
@@ -58,6 +42,11 @@ if (!rootElement) {
     console.log("React app mounted successfully");
   } catch (error) {
     console.error("Error rendering React application:", error);
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.style.display = 'none';
+    }
+    
     document.body.innerHTML = `
       <div style="padding: 20px; text-align: center;">
         <h2>Application Error</h2>

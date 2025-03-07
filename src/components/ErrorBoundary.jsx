@@ -8,15 +8,19 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log the error to console
     console.error('Error caught by ErrorBoundary:', error);
     console.error('Component stack:', errorInfo.componentStack);
     this.setState({ errorInfo });
+    
+    // Ensure loading screen is hidden when an error occurs
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.style.display = 'none';
+    }
   }
 
   render() {
