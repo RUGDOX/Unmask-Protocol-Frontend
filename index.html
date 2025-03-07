@@ -68,28 +68,31 @@
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Hide loading screen when app is ready
+      // Hide loading screen when app is ready with a maximum timeout
       window.addEventListener('load', function() {
         console.log('Window loaded, hiding loading screen');
+        
+        // This is a fallback - React should handle the removal of the loading screen
         setTimeout(function() {
           const loadingScreen = document.getElementById('loading-screen');
-          if (loadingScreen) {
+          if (loadingScreen && loadingScreen.style.display !== 'none') {
+            console.log('Fallback: Hiding loading screen after window load');
             loadingScreen.style.opacity = '0';
             loadingScreen.style.transition = 'opacity 0.5s ease';
             setTimeout(function() {
-              loadingScreen.style.display = 'none';
+              if (loadingScreen) loadingScreen.style.display = 'none';
             }, 500);
           }
         }, 800);
       });
       
-      // Fallback in case the load event doesn't fire correctly
+      // Absolute fallback in case nothing works
       setTimeout(function() {
         console.log('Fallback timeout triggered');
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen && loadingScreen.style.display !== 'none') {
+          console.log('Maximum timeout: Forcing loading screen removal');
           loadingScreen.style.display = 'none';
-          console.log('Forced loading screen removal');
         }
       }, 5000);
     </script>

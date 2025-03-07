@@ -16,6 +16,12 @@ window.addEventListener('error', (event) => {
   if (event.target && event.target.outerHTML) {
     console.error('Error source element:', event.target.outerHTML.substring(0, 100));
   }
+  
+  // Don't hide the loading screen on error, allow error UI to display
+  const loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'none';
+  }
 });
 
 // Mark the application start time
@@ -37,12 +43,25 @@ if (!rootElement) {
 } else {
   try {
     console.log("Mounting React app to root element:", rootElement);
+    
+    // Hide loading screen on successful mount
+    const hideLoadingScreen = () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          if (loadingScreen) loadingScreen.style.display = 'none';
+        }, 500);
+      }
+    };
+    
     const root = ReactDOM.createRoot(rootElement);
     
     root.render(
       <React.StrictMode>
         <BrowserRouter>
-          <App />
+          <App onLoad={hideLoadingScreen} />
         </BrowserRouter>
       </React.StrictMode>
     );

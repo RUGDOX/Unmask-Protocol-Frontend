@@ -26,17 +26,23 @@ const PageLoader = () => (
   </div>
 );
 
-function App() {
+function App({ onLoad }) {
   useEffect(() => {
     console.log('App component mounted');
     
     // Force dark mode
     document.documentElement.classList.add('dark');
     
+    // Call onLoad callback if provided
+    if (typeof onLoad === 'function') {
+      console.log('Calling onLoad callback');
+      onLoad();
+    }
+    
     return () => {
       console.log('App component unmounted');
     };
-  }, []);
+  }, [onLoad]);
   
   return (
     <ErrorBoundary>

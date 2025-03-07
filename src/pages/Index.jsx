@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, AlertTriangle, BadgeCheck, Zap, Lock } from 'lucide-react';
@@ -5,25 +6,21 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ThemeToggle } from '../components/ThemeToggle';
 
+// Separate component for performance monitoring
 const PerformanceMonitor = () => {
   useEffect(() => {
     const reportWebVitals = () => {
       if (window.performance && window.performance.timing) {
         const t = window.performance.timing;
-        
         const domLoaded = t.domContentLoadedEventEnd - t.navigationStart;
         console.log(`DOM Content Loaded: ${domLoaded}ms`);
-        
         const pageLoad = t.loadEventEnd - t.navigationStart;
         console.log(`Page Load Time: ${pageLoad}ms`);
       }
     };
 
     window.addEventListener('load', reportWebVitals);
-    
-    return () => {
-      window.removeEventListener('load', reportWebVitals);
-    };
+    return () => window.removeEventListener('load', reportWebVitals);
   }, []);
 
   return null;
@@ -34,37 +31,25 @@ const Index = () => {
   
   useEffect(() => {
     console.log("Index component mounted");
-    
-    try {
-      // Mark component as loaded
-      setIsLoaded(true);
-      console.log("Index component marked as loaded");
-      
-      // Hide the loading screen if it's still visible
-      const loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => {
-          if (loadingScreen) loadingScreen.style.display = 'none';
-        }, 500);
-      }
-    } catch (error) {
-      console.error("Error in Index component:", error);
-    }
+    // Mark component as loaded immediately
+    setIsLoaded(true);
+    console.log("Index component marked as loaded");
   }, []);
 
   // Debug render
   console.log("Index rendering, isLoaded:", isLoaded);
+  
+  if (!isLoaded) {
+    return <div className="h-screen w-full bg-black flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>;
+  }
 
   return (
     <>
       <PerformanceMonitor />
       
-      <div 
-        className={`min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-        style={{ transition: 'opacity 0.5s ease' }}
-      >
+      <div className="min-h-screen bg-black dark:bg-gray-900 transition-colors duration-200 cyber-grid">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-purple-950/30 pointer-events-none"></div>
         
         <div className="container relative mx-auto px-4 py-8">
@@ -85,6 +70,7 @@ const Index = () => {
             <ThemeToggle />
           </header>
 
+          {/* Main content */}
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gradient glow-effect">
               Blockchain Security Reimagined
@@ -95,6 +81,7 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Cards */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             <Card className="overflow-hidden border-0 dark:border-gray-700 bg-gray-900/80 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 shimmer">
               <div className="h-1.5 w-full bg-gradient-to-r from-red-500 to-orange-500"></div>
@@ -149,6 +136,7 @@ const Index = () => {
             </Card>
           </div>
 
+          {/* Secondary cards */}
           <div className="flex flex-col md:flex-row gap-6 mb-16 justify-center">
             <Card className="md:w-1/3 border-0 dark:border-gray-700 bg-gray-900/80 backdrop-blur-sm hover:shadow-md hover:shadow-blue-500/10 transition-all">
               <CardHeader className="pb-2">
@@ -185,6 +173,7 @@ const Index = () => {
             </Card>
           </div>
 
+          {/* Stats */}
           <div className="max-w-3xl mx-auto mb-16 p-6 rounded-xl bg-gray-900/80 backdrop-blur-sm border border-blue-500/20">
             <h3 className="text-xl font-bold mb-4 text-center text-gradient">The Future of Web3 Security</h3>
             <p className="text-blue-100 mb-6 text-center">
@@ -210,6 +199,7 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Footer */}
           <footer className="border-t border-blue-500/20 pt-6 mt-12 text-center text-sm text-blue-200">
             <div className="flex justify-center mb-4">
               <img 
