@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -11,11 +10,10 @@ const Footer = () => {
             <img 
               src="/unmask-logo.png" 
               alt="Unmask Protocol Logo" 
-              className="h-8 w-8 object-contain"
+              className="h-6 w-6 object-contain"
               onError={(e) => {
                 e.target.onerror = null; // Prevent infinite error loop
-                console.log("Logo PNG failed to load");
-                // Use SVG as fallback
+                console.log("Footer logo PNG failed to load");
                 e.target.src = '/unmask-logo.svg';
               }}
             />
