@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 
-// Eager load the Index page for faster initial load
+// Import the Index page
 import Index from './pages/Index';
 
 // Lazy load other pages
@@ -28,20 +28,13 @@ const PageLoader = () => (
 
 function App({ onLoad }) {
   useEffect(() => {
-    console.log('App component mounted');
-    
     // Force dark mode
     document.documentElement.classList.add('dark');
     
-    // Call onLoad callback if provided
+    // Call onLoad callback when component is mounted
     if (typeof onLoad === 'function') {
-      console.log('Calling onLoad callback');
       onLoad();
     }
-    
-    return () => {
-      console.log('App component unmounted');
-    };
   }, [onLoad]);
   
   return (

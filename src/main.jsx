@@ -6,28 +6,17 @@ import App from "./App.jsx";
 import "./index.css";
 import "./utils/performance"; // Import performance monitoring
 
-// Enable more detailed error reporting
 console.log("Application initializing...");
 
 // Global error handler
 window.addEventListener('error', (event) => {
   console.error('Global error caught:', event.error);
-  // Log the element that caused the error if available
-  if (event.target && event.target.outerHTML) {
-    console.error('Error source element:', event.target.outerHTML.substring(0, 100));
-  }
-  
-  // Don't hide the loading screen on error, allow error UI to display
+  // Don't hide the loading screen on error
   const loadingScreen = document.getElementById('loading-screen');
   if (loadingScreen) {
     loadingScreen.style.display = 'none';
   }
 });
-
-// Mark the application start time
-if (window.performance && window.performance.mark) {
-  window.performance.mark('app-init-start');
-}
 
 // Create root with error handling
 const rootElement = document.getElementById("root");
@@ -42,7 +31,7 @@ if (!rootElement) {
   `;
 } else {
   try {
-    console.log("Mounting React app to root element:", rootElement);
+    console.log("Mounting React app to root element");
     
     // Hide loading screen on successful mount
     const hideLoadingScreen = () => {
@@ -76,15 +65,5 @@ if (!rootElement) {
         <pre style="text-align: left; background: #333; color: #f88; padding: 10px; border-radius: 4px; max-width: 800px; margin: 20px auto; overflow: auto;">${error.message}</pre>
       </div>
     `;
-  }
-}
-
-// Mark application initialization complete
-if (window.performance && window.performance.mark) {
-  window.performance.mark('app-init-end');
-  window.performance.measure('App Initialization', 'app-init-start', 'app-init-end');
-  const measures = window.performance.getEntriesByName('App Initialization');
-  if (measures.length > 0) {
-    console.log(`App initialization took: ${measures[0].duration.toFixed(2)}ms`);
   }
 }
