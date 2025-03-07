@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for API requests
  */
@@ -16,7 +17,7 @@ async function fetchWithAuth(endpoint, options = {}, useCache = false) {
   // Check cache for GET requests if caching is enabled
   const cacheKey = `${options.method || 'GET'}-${endpoint}-${JSON.stringify(options.body || {})}`;
   
-  if (useCache && options.method === undefined || options.method === 'GET') {
+  if (useCache && (options.method === undefined || options.method === 'GET')) {
     const cachedResponse = apiCache.get(cacheKey);
     if (cachedResponse && Date.now() < cachedResponse.expiry) {
       console.log(`[API] Using cached response for ${endpoint}`);

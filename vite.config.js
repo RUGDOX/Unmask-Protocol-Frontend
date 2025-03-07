@@ -1,3 +1,4 @@
+
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -8,6 +9,20 @@ export default defineConfig({
   server: {
     host: "::",
     port: "8080",
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+    // Ensure build succeeds even with warnings
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['sonner', 'lucide-react'],
+        },
+      },
+    },
   },
   plugins: [react()],
   resolve: {
