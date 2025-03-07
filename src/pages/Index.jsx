@@ -16,9 +16,9 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-indigo-950/30 to-purple-950/40 pointer-events-none z-0"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Hero Section with animated gradient border */}
-        <section className="text-center mb-16 glow-effect relative">
-          <div className="gradient-border p-8 glass-morph">
+        {/* Hero Section with binary particles instead of spinning border */}
+        <section className="text-center mb-16 relative">
+          <div className="binary-particles-bg glass-morph p-8 rounded-lg border border-blue-500/20 shadow-glow">
             <p className="text-xl mb-8 max-w-2xl mx-auto">
               Advanced blockchain security platform for detecting scams, verifying projects, and protecting users in the crypto ecosystem.
             </p>
