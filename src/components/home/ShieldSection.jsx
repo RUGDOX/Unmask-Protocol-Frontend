@@ -15,7 +15,7 @@ const ShieldSection = () => (
       </div>
       <div className="w-full md:w-1/3 order-1 md:order-2 flex justify-center">
         <div className="pulse-subtle">
-          <img src="protection-shield.png" alt="Protection Shield" className="h-16 w-auto" />
+          <img src="/protection-shield.png" alt="Protection Shield" className="h-16 w-auto" />
         </div>
       </div>
     </div>
