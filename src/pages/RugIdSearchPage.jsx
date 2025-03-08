@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { toast } from "sonner";
 import { Search, Shield, AlertCircle, Check, AlertTriangle, XCircle } from "lucide-react";
@@ -7,7 +6,6 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { ThemeToggle } from '../components/ThemeToggle';
-import Header from '../components/layout/Header';
 
 const RugIdSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
