@@ -1,287 +1,398 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Shield, Key, Check, AlertCircle } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { z } from 'zod';
-
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import Header from '../components/layout/Header';
+import { Shield, Info, ArrowLeft } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Checkbox } from '../components/ui/checkbox';
+import { Label } from '../components/ui/label';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '../components/ui/select';
 
 const ApiKeyRequestPage = () => {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    organizationName: '',
-    contactName: '',
-    email: '',
+    organization: '',
     website: '',
-    projectType: '',
+    contactName: '',
+    contactEmail: '',
+    contactPhone: '',
     useCase: '',
-    estimatedRequests: '',
-    securityMeasures: '',
-    termsAgreed: false
+    usageVolume: 'low',
+    requestedEndpoints: [],
+    security: '',
+    agreeTerms: false,
+    agreePrivacy: false
   });
   const [errors, setErrors] = useState({});
-
-  const formSchema = z.object({
-    organizationName: z.string().min(2, { message: "Organization name is required" }),
-    contactName: z.string().min(2, { message: "Contact name is required" }),
-    email: z.string().email({ message: "Valid email is required" }),
-    website: z.string().url({ message: "Valid website URL is required" }),
-    projectType: z.string().min(2, { message: "Project type is required" }),
-    useCase: z.string().min(20, { message: "Please provide more details about your use case" }),
-    estimatedRequests: z.string().min(1, { message: "Estimated requests is required" }),
-    securityMeasures: z.string().min(20, { message: "Please describe your security measures" }),
-    termsAgreed: z.boolean().refine(val => val === true, { message: "You must agree to the terms" })
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: type === 'checkbox' ? checked : value
-    });
-
-    // Clear error when field is edited
+    }));
+    
+    // Clear error for this field when user starts typing
     if (errors[name]) {
-      setErrors({
-        ...errors,
+      setErrors(prev => ({
+        ...prev,
         [name]: null
-      });
+      }));
+    }
+  };
+  
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
     }
   };
 
   const validateForm = () => {
-    try {
-      formSchema.parse(formData);
-      return true;
-    } catch (error) {
-      const formattedErrors = {};
-      error.errors.forEach((err) => {
-        if (err.path) {
-          formattedErrors[err.path[0]] = err.message;
-        }
-      });
-      setErrors(formattedErrors);
-      return false;
+    const newErrors = {};
+    
+    if (!formData.organization.trim()) {
+      newErrors.organization = 'Organization name is required';
     }
+    
+    if (!formData.website.trim()) {
+      newErrors.website = 'Website URL is required';
+    } else if (!/^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i.test(formData.website)) {
+      newErrors.website = 'Please enter a valid URL';
+    }
+    
+    if (!formData.contactName.trim()) {
+      newErrors.contactName = 'Contact name is required';
+    }
+    
+    if (!formData.contactEmail.trim()) {
+      newErrors.contactEmail = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.contactEmail)) {
+      newErrors.contactEmail = 'Please enter a valid email address';
+    }
+    
+    if (!formData.useCase.trim()) {
+      newErrors.useCase = 'Please describe your use case';
+    }
+    
+    if (!formData.security.trim()) {
+      newErrors.security = 'Please describe your security measures';
+    }
+    
+    if (!formData.agreeTerms) {
+      newErrors.agreeTerms = 'You must agree to the terms of service';
+    }
+    
+    if (!formData.agreePrivacy) {
+      newErrors.agreePrivacy = 'You must agree to the privacy policy';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      toast.error("Please correct the errors in the form");
+      toast.error('Please correct the errors in the form');
       return;
     }
-
+    
     setIsSubmitting(true);
-
+    
     try {
-      // In a real application, this would be an API call
-      // For now, we'll simulate a successful submission
+      // Simulate API request
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      toast.success("API key request submitted successfully! We'll review your request and get back to you soon.");
+      toast.success('API key request submitted successfully!');
       navigate('/');
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to submit your request. Please try again later.");
+      console.error('Error submitting API key request:', error);
+      toast.error('Failed to submit request. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <>
-      <Header />
-      <div className="container max-w-4xl py-12">
-        <div className="mb-10 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 bg-blue-500/10 rounded-full flex items-center justify-center">
-              <Key className="h-8 w-8 text-blue-500" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold mb-3 text-gradient">API Key Request</h1>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Request access to the Unmask Protocol Threat Database API. Submit your details below, and our team will review your request.
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6">
+      <div className="w-full max-w-3xl">
+        <div className="text-center mb-8">
+          <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h1 className="text-3xl font-bold">API Access Request</h1>
+          <p className="mt-2 text-muted-foreground">
+            Request access to the Unmask Protocol threat intelligence API
           </p>
+          <div className="mt-4">
+            <Link to="/api-info" className="inline-flex items-center text-primary hover:underline">
+              <Info className="h-4 w-4 mr-1" />
+              Learn more about our API
+            </Link>
+          </div>
         </div>
-
-        <Card className="border border-blue-500/20 shadow-glow">
-          <CardHeader>
-            <CardTitle>Request Form</CardTitle>
-            <CardDescription>
-              Please provide accurate information to help us process your request quickly.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="organizationName">Organization Name</Label>
-                  <Input
-                    id="organizationName"
-                    name="organizationName"
-                    value={formData.organizationName}
-                    onChange={handleChange}
-                    className={errors.organizationName ? "border-red-500" : ""}
-                    placeholder="Your company or project name"
-                  />
-                  {errors.organizationName && <p className="text-red-500 text-sm">{errors.organizationName}</p>}
+        
+        <Card>
+          <form onSubmit={handleSubmit}>
+            <CardHeader>
+              <CardTitle>Organization Information</CardTitle>
+              <CardDescription>
+                Tell us about your company or project
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="organization">
+                      Organization Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="organization"
+                      name="organization"
+                      placeholder="Your company or project name"
+                      value={formData.organization}
+                      onChange={handleChange}
+                      error={errors.organization}
+                      className={errors.organization ? "border-destructive" : ""}
+                    />
+                    {errors.organization && (
+                      <p className="text-sm text-destructive">{errors.organization}</p>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="website">
+                      Website URL <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="website"
+                      name="website"
+                      placeholder="https://example.com"
+                      value={formData.website}
+                      onChange={handleChange}
+                      className={errors.website ? "border-destructive" : ""}
+                    />
+                    {errors.website && (
+                      <p className="text-sm text-destructive">{errors.website}</p>
+                    )}
+                  </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="contactName">Contact Name</Label>
-                  <Input
-                    id="contactName"
-                    name="contactName"
-                    value={formData.contactName}
-                    onChange={handleChange}
-                    className={errors.contactName ? "border-red-500" : ""}
-                    placeholder="Full name of primary contact"
-                  />
-                  {errors.contactName && <p className="text-red-500 text-sm">{errors.contactName}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={errors.email ? "border-red-500" : ""}
-                    placeholder="contact@example.com"
-                  />
-                  {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleChange}
-                    className={errors.website ? "border-red-500" : ""}
-                    placeholder="https://example.com"
-                  />
-                  {errors.website && <p className="text-red-500 text-sm">{errors.website}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="projectType">Project Type</Label>
-                  <Input
-                    id="projectType"
-                    name="projectType"
-                    value={formData.projectType}
-                    onChange={handleChange}
-                    className={errors.projectType ? "border-red-500" : ""}
-                    placeholder="Web3 Security, DApp, Exchange, etc."
-                  />
-                  {errors.projectType && <p className="text-red-500 text-sm">{errors.projectType}</p>}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="estimatedRequests">Estimated API Requests</Label>
-                  <Input
-                    id="estimatedRequests"
-                    name="estimatedRequests"
-                    value={formData.estimatedRequests}
-                    onChange={handleChange}
-                    className={errors.estimatedRequests ? "border-red-500" : ""}
-                    placeholder="Requests per day/month"
-                  />
-                  {errors.estimatedRequests && <p className="text-red-500 text-sm">{errors.estimatedRequests}</p>}
+                
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="contactName">
+                      Contact Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="contactName"
+                      name="contactName"
+                      placeholder="Full name"
+                      value={formData.contactName}
+                      onChange={handleChange}
+                      className={errors.contactName ? "border-destructive" : ""}
+                    />
+                    {errors.contactName && (
+                      <p className="text-sm text-destructive">{errors.contactName}</p>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="contactEmail">
+                      Email <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="contactEmail"
+                      name="contactEmail"
+                      type="email"
+                      placeholder="email@example.com"
+                      value={formData.contactEmail}
+                      onChange={handleChange}
+                      className={errors.contactEmail ? "border-destructive" : ""}
+                    />
+                    {errors.contactEmail && (
+                      <p className="text-sm text-destructive">{errors.contactEmail}</p>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="contactPhone">
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="contactPhone"
+                      name="contactPhone"
+                      placeholder="+1 (555) 123-4567"
+                      value={formData.contactPhone}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </div>
-
+              
               <div className="space-y-2">
-                <Label htmlFor="useCase">Intended Use Case</Label>
+                <Label htmlFor="useCase">
+                  Use Case Description <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="useCase"
                   name="useCase"
+                  placeholder="Describe how you plan to use our API in your application or service"
                   value={formData.useCase}
                   onChange={handleChange}
-                  className={`min-h-[100px] ${errors.useCase ? "border-red-500" : ""}`}
-                  placeholder="Please describe how you plan to use the API data"
+                  className={`min-h-[100px] ${errors.useCase ? "border-destructive" : ""}`}
                 />
-                {errors.useCase && <p className="text-red-500 text-sm">{errors.useCase}</p>}
+                {errors.useCase && (
+                  <p className="text-sm text-destructive">{errors.useCase}</p>
+                )}
               </div>
-
+              
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="usageVolume">
+                    Estimated Usage Volume
+                  </Label>
+                  <Select 
+                    value={formData.usageVolume} 
+                    onValueChange={(value) => handleSelectChange('usageVolume', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select usage volume" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low (< 1,000 requests/day)</SelectItem>
+                      <SelectItem value="medium">Medium (1,000 - 10,000 requests/day)</SelectItem>
+                      <SelectItem value="high">High (10,000 - 100,000 requests/day)</SelectItem>
+                      <SelectItem value="veryHigh">Very High (> 100,000 requests/day)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="securityMeasures">Security Measures</Label>
-                <Textarea
-                  id="securityMeasures"
-                  name="securityMeasures"
-                  value={formData.securityMeasures}
-                  onChange={handleChange}
-                  className={`min-h-[100px] ${errors.securityMeasures ? "border-red-500" : ""}`}
-                  placeholder="Describe how you'll secure and protect the API key and data"
-                />
-                {errors.securityMeasures && <p className="text-red-500 text-sm">{errors.securityMeasures}</p>}
-              </div>
-
-              <Alert className="bg-blue-500/10 border-blue-500/30">
-                <Shield className="h-4 w-4 text-blue-500" />
-                <AlertTitle>API Usage Terms</AlertTitle>
-                <AlertDescription>
-                  By requesting an API key, you agree to our data usage policies, rate limits, and security requirements. 
-                  The API key provided is for your use only and should not be shared. Misuse may result in revocation of access.
-                </AlertDescription>
-              </Alert>
-
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  id="termsAgreed"
-                  name="termsAgreed"
-                  checked={formData.termsAgreed}
-                  onChange={handleChange}
-                  className="mt-1"
-                />
-                <Label htmlFor="termsAgreed" className="flex-1">
-                  I agree to the API usage terms and conditions, and I confirm that the information provided is accurate.
-                  {errors.termsAgreed && <span className="block text-red-500 text-sm">{errors.termsAgreed}</span>}
+                <Label htmlFor="security">
+                  Security Measures <span className="text-destructive">*</span>
                 </Label>
+                <Textarea
+                  id="security"
+                  name="security"
+                  placeholder="Describe how you will secure the API key and handle any sensitive data"
+                  value={formData.security}
+                  onChange={handleChange}
+                  className={`min-h-[100px] ${errors.security ? "border-destructive" : ""}`}
+                />
+                {errors.security && (
+                  <p className="text-sm text-destructive">{errors.security}</p>
+                )}
               </div>
-            </form>
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Button onClick={() => navigate('/')} variant="outline" className="mr-2">
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  Submit Request <Check className="ml-2 h-4 w-4" />
-                </span>
-              )}
-            </Button>
-          </CardFooter>
+              
+              <div className="space-y-4">
+                <div className="flex items-start space-x-2">
+                  <Checkbox 
+                    id="agreeTerms" 
+                    name="agreeTerms"
+                    checked={formData.agreeTerms}
+                    onCheckedChange={(checked) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        agreeTerms: checked
+                      }));
+                      if (errors.agreeTerms) {
+                        setErrors(prev => ({
+                          ...prev,
+                          agreeTerms: null
+                        }));
+                      }
+                    }}
+                  />
+                  <Label 
+                    htmlFor="agreeTerms" 
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I agree to the <Link to="#" className="text-primary hover:underline">Terms of Service</Link>
+                  </Label>
+                </div>
+                {errors.agreeTerms && (
+                  <p className="text-sm text-destructive">{errors.agreeTerms}</p>
+                )}
+                
+                <div className="flex items-start space-x-2">
+                  <Checkbox 
+                    id="agreePrivacy" 
+                    name="agreePrivacy"
+                    checked={formData.agreePrivacy}
+                    onCheckedChange={(checked) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        agreePrivacy: checked
+                      }));
+                      if (errors.agreePrivacy) {
+                        setErrors(prev => ({
+                          ...prev,
+                          agreePrivacy: null
+                        }));
+                      }
+                    }}
+                  />
+                  <Label 
+                    htmlFor="agreePrivacy" 
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I agree to the <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>
+                  </Label>
+                </div>
+                {errors.agreePrivacy && (
+                  <p className="text-sm text-destructive">{errors.agreePrivacy}</p>
+                )}
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:space-x-4 sm:space-y-0">
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="w-full sm:w-auto"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
       </div>
-    </>
+    </div>
   );
 };
 

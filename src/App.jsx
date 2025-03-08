@@ -13,6 +13,7 @@ import ProjectRegistrationPage from './pages/ProjectRegistrationPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import AboutPage from './pages/AboutPage';
 import ApiKeyRequestPage from './pages/ApiKeyRequestPage';
+import ApiInfoPage from './pages/ApiInfoPage';
 
 function App() {
   return (
@@ -46,6 +47,12 @@ function App() {
               </>
             } />
             <Route path="/api" element={<ApiKeyRequestPage />} />
+            <Route path="/api-info" element={
+              <>
+                <Header />
+                <ApiInfoPage />
+              </>
+            } />
             <Route path="/unauthorized" element={
               <>
                 <Header />

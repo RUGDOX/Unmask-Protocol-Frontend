@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -103,9 +102,9 @@ export const AuthProvider = ({ children }) => {
         
         // Redirect based on role
         if (response.role === 'admin') {
-          navigate('/admin');
+          navigate('/');
         } else if (response.role === 'agent') {
-          navigate('/agent');
+          navigate('/');
         }
         
         return true;
@@ -122,12 +121,8 @@ export const AuthProvider = ({ children }) => {
       
       toast.success(`Welcome back, ${credentials.username}!`);
       
-      // Redirect based on role
-      if (response.role === 'admin') {
-        navigate('/admin');
-      } else if (response.role === 'agent') {
-        navigate('/agent');
-      }
+      // Redirect based on role - changed to navigate to home page
+      navigate('/');
       
       return true;
     } catch (error) {
