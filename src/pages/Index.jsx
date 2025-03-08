@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { AlertTriangle, CheckCircle, Zap, FileText, Eye, Lock, Bell } from 'lucide-react';
-import protectionShield from '/protection-shield.png';
 
 const Index = () => {
   return (
@@ -47,7 +47,7 @@ const Index = () => {
             </div>
             <div className="w-full md:w-1/3 order-1 md:order-2 flex justify-center">
               <div className="pulse-subtle">
-                <img src={protectionShield} alt="Protection Shield" className="h-16 w-auto" />
+                <img src="protection-shield.png" alt="Protection Shield" className="h-16 w-auto" />
               </div>
             </div>
           </div>
