@@ -21,7 +21,7 @@ const ShieldSection = () => (
             className="h-16 w-auto" 
             onError={(e) => {
               console.error("Image failed to load:", e);
-              e.target.src = "/unmask-logo-flat.png"; // Fallback image
+              e.target.src = "/protected.png"; // Fallback image
             }}
           />
         </div>
