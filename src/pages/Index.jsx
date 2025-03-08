@@ -47,7 +47,7 @@ const Index = () => {
             </div>
             <div className="w-full md:w-1/3 order-1 md:order-2 flex justify-center">
               <div className="pulse-subtle">
-                <img src="/protection-shield.png" alt="Protection Shield" className="h-16 w-auto" />
+                <img src="/public/protection-shield.png" alt="Protection Shield" className="h-16 w-auto" />
               </div>
             </div>
           </div>
@@ -63,12 +63,12 @@ const Index = () => {
             <FeatureCard 
               icon={<Eye className="h-10 w-10 text-blue-500" />}
               title="Identity Verification Layer"
-              description="Ensures project founders are real, verified individuals through secure, encrypted checks."
+              description="Project founders submit to secure, encrypted & in-depth identity investigations."
             />
             <FeatureCard 
               icon={<Lock className="h-10 w-10 text-purple-500" />}
               title="Encrypted Data Vault"
-              description="Utilizes quantum-safe encryption to secure identity data while maintaining strict access controls."
+              description="Utilizes multiple layers of encryption & game changing threat response mechanisms to secure identity data while maintaining strict access controls."
             />
             <FeatureCard 
               icon={<CheckCircle className="h-10 w-10 text-green-500" />}
@@ -102,7 +102,7 @@ const Index = () => {
                   number="02"
                   icon={<Lock className="h-8 w-8 text-purple-400" />}
                   title="PII Vault Encryption"
-                  description="Verified data is encrypted using AES-256 standards and securely vaulted for future reference."
+                  description="Verified data is encrypted in layers and securely vaulted for future reference if fraud suspected."
                 />
                 
                 <StepCard 
