@@ -80,10 +80,12 @@ export const AuthProvider = ({ children }) => {
       // Environment check for development mode
       const isDevelopment = import.meta.env.DEV;
       
+      let response;
+      
       // For demo purposes only - use in development mode
       if (isDevelopment && (credentials.username === 'admin' || credentials.username === 'agent')) {
         // Simulated response for demonstration
-        const response = {
+        response = {
           token: 'simulated_jwt_token',
           expiresIn: 900, // 15 minutes
           id: credentials.username === 'admin' ? '1' : '2',
@@ -92,30 +94,10 @@ export const AuthProvider = ({ children }) => {
         
         // Store auth data
         authService.saveAuthData(response);
-        
-        setUser({
-          id: response.id,
-          role: response.role,
-          username: credentials.username,
-        });
-        
-        // Set up token refresh
-        authService.setupTokenRefresh();
-        
-        toast.success(`Welcome back, ${credentials.username}!`);
-        
-        // Redirect based on role
-        if (response.role === 'admin') {
-          navigate('/admin');
-        } else if (response.role === 'agent') {
-          navigate('/investigations');
-        }
-        
-        return true;
+      } else {
+        // Real implementation for production
+        response = await authService.login(credentials);
       }
-      
-      // Real implementation for production
-      const response = await authService.login(credentials);
       
       setUser({
         id: response.id,
@@ -138,7 +120,7 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Login failed:', error);
-      toast.error('Login failed. Please check your credentials.');
+      toast.error(`Login failed: ${error.message || 'Please check your credentials.'}`);
       return false;
     } finally {
       setLoading(false);

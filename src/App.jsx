@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/layout/Header';
@@ -80,6 +80,17 @@ function App() {
             <Route path="/investigations/*" element={
               <ProtectedRoute requiredRole="agent">
                 <AgentInvestigationPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Default redirect for authenticated users */}
+            <Route path="/auth-redirect" element={
+              <ProtectedRoute>
+                {({ user }) => {
+                  if (user.role === 'admin') return <Navigate to="/admin" replace />;
+                  if (user.role === 'agent') return <Navigate to="/investigations" replace />;
+                  return <Navigate to="/" replace />;
+                }}
               </ProtectedRoute>
             } />
             

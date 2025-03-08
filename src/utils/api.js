@@ -6,11 +6,13 @@ import { authService } from '../services/authService';
 
 // Determine API base URL based on environment
 // In production, this will use the environment variable set in Vercel
-// In development, it falls back to the local development API or mock server
+// In development, it falls back to the local development API
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
                     (import.meta.env.PROD ? 
                      'https://api.unmask.io' : 
-                     'https://api.unmask.io');
+                     'http://localhost:3000');
+
+console.log('API BASE URL:', API_BASE_URL);
 
 // Simple in-memory cache
 const apiCache = new Map();
@@ -47,10 +49,11 @@ async function fetchWithAuth(endpoint, options = {}, useCache = false) {
     // Log API calls in development mode
     if (import.meta.env.DEV) {
       console.log(`[API] ${options.method || 'GET'} request to ${endpoint}`);
+      console.log(`[API] Full URL: ${API_BASE_URL}${endpoint}`);
     }
 
     // In development mode, simulate API response for certain endpoints if no real API is available
-    if (import.meta.env.DEV && !API_BASE_URL.includes('localhost') && !options.forceReal) {
+    if (import.meta.env.DEV && !options.forceReal) {
       const mockResponse = await getMockResponse(endpoint, options.method || 'GET', options.body);
       if (mockResponse !== null) {
         await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network delay
@@ -149,7 +152,29 @@ async function getMockResponse(endpoint, method, body) {
   // Only use mock responses in development
   if (!import.meta.env.DEV) return null;
 
-  // Example mock responses
+  console.log(`[MOCK API] Handling ${method} request to ${endpoint}`);
+
+  // Auth endpoints
+  if (endpoint === '/auth/login' && method === 'POST') {
+    const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
+    if (parsedBody.username === 'admin') {
+      return {
+        token: 'simulated_admin_jwt_token',
+        expiresIn: 900,
+        id: '1',
+        role: 'admin',
+      };
+    } else if (parsedBody.username === 'agent') {
+      return {
+        token: 'simulated_agent_jwt_token',
+        expiresIn: 900,
+        id: '2',
+        role: 'agent',
+      };
+    }
+    throw new Error('Invalid credentials');
+  }
+
   if (endpoint === '/auth/profile' && method === 'GET') {
     return {
       username: localStorage.getItem('user_role') === 'admin' ? 'admin' : 'agent',
@@ -159,9 +184,23 @@ async function getMockResponse(endpoint, method, body) {
     };
   }
 
+  if (endpoint === '/auth/refresh-token' && method === 'POST') {
+    const role = localStorage.getItem('user_role');
+    if (role) {
+      return {
+        token: `simulated_${role}_refreshed_jwt_token`,
+        expiresIn: 900,
+        id: role === 'admin' ? '1' : '2',
+        role: role,
+      };
+    }
+    throw new Error('Invalid refresh token');
+  }
+
   // More mock endpoints can be added here as needed
   
   // Return null to indicate no mock available, should use real API
+  console.log('[MOCK API] No mock available, will attempt real API call');
   return null;
 }
 
