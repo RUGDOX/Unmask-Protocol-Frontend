@@ -14,6 +14,9 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 import AboutPage from './pages/AboutPage';
 import ApiKeyRequestPage from './pages/ApiKeyRequestPage';
 import ApiInfoPage from './pages/ApiInfoPage';
+import AdminPanel from './pages/AdminPanel';
+import AgentInvestigationPage from './pages/AgentInvestigationPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -65,6 +68,21 @@ function App() {
                 <AboutPage />
               </>
             } />
+            
+            {/* Protected Admin Route */}
+            <Route path="/admin/*" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminPanel />
+              </ProtectedRoute>
+            } />
+            
+            {/* Protected Agent Route */}
+            <Route path="/investigations/*" element={
+              <ProtectedRoute requiredRole="agent">
+                <AgentInvestigationPage />
+              </ProtectedRoute>
+            } />
+            
             <Route path="*" element={
               <>
                 <Header />

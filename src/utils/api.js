@@ -4,8 +4,13 @@
  */
 import { authService } from '../services/authService';
 
-// Use import.meta.env instead of process.env for Vite projects
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.unmask.io';
+// Determine API base URL based on environment
+// In production, this will use the environment variable set in Vercel
+// In development, it falls back to the local development API or mock server
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+                    (import.meta.env.PROD ? 
+                     'https://api.unmask.io' : 
+                     'https://api.unmask.io');
 
 // Simple in-memory cache
 const apiCache = new Map();
@@ -38,6 +43,20 @@ async function fetchWithAuth(endpoint, options = {}, useCache = false) {
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
+
+    // Log API calls in development mode
+    if (import.meta.env.DEV) {
+      console.log(`[API] ${options.method || 'GET'} request to ${endpoint}`);
+    }
+
+    // In development mode, simulate API response for certain endpoints if no real API is available
+    if (import.meta.env.DEV && !API_BASE_URL.includes('localhost') && !options.forceReal) {
+      const mockResponse = await getMockResponse(endpoint, options.method || 'GET', options.body);
+      if (mockResponse !== null) {
+        await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network delay
+        return mockResponse;
+      }
+    }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
@@ -120,6 +139,30 @@ async function fetchWithAuth(endpoint, options = {}, useCache = false) {
     console.error('API request failed:', error);
     throw error;
   }
+}
+
+/**
+ * Mock response function for development without a real API
+ * This can be expanded to handle more endpoints as needed
+ */
+async function getMockResponse(endpoint, method, body) {
+  // Only use mock responses in development
+  if (!import.meta.env.DEV) return null;
+
+  // Example mock responses
+  if (endpoint === '/auth/profile' && method === 'GET') {
+    return {
+      username: localStorage.getItem('user_role') === 'admin' ? 'admin' : 'agent',
+      email: localStorage.getItem('user_role') === 'admin' ? 'admin@unmask.io' : 'agent@unmask.io',
+      firstName: localStorage.getItem('user_role') === 'admin' ? 'Admin' : 'Agent',
+      lastName: 'User',
+    };
+  }
+
+  // More mock endpoints can be added here as needed
+  
+  // Return null to indicate no mock available, should use real API
+  return null;
 }
 
 /**

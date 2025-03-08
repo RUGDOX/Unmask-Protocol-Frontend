@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -76,8 +77,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // For demo purposes only - remove in production
-      if (credentials.username === 'admin' || credentials.username === 'agent') {
+      // Environment check for development mode
+      const isDevelopment = import.meta.env.DEV;
+      
+      // For demo purposes only - use in development mode
+      if (isDevelopment && (credentials.username === 'admin' || credentials.username === 'agent')) {
         // Simulated response for demonstration
         const response = {
           token: 'simulated_jwt_token',
@@ -102,15 +106,15 @@ export const AuthProvider = ({ children }) => {
         
         // Redirect based on role
         if (response.role === 'admin') {
-          navigate('/');
+          navigate('/admin');
         } else if (response.role === 'agent') {
-          navigate('/');
+          navigate('/investigations');
         }
         
         return true;
       }
       
-      // Real implementation
+      // Real implementation for production
       const response = await authService.login(credentials);
       
       setUser({
@@ -121,8 +125,15 @@ export const AuthProvider = ({ children }) => {
       
       toast.success(`Welcome back, ${credentials.username}!`);
       
-      // Redirect based on role - changed to navigate to home page
-      navigate('/');
+      // Redirect based on role
+      if (response.role === 'admin') {
+        navigate('/admin');
+      } else if (response.role === 'agent') {
+        navigate('/investigations');
+      } else {
+        // Default redirect
+        navigate('/');
+      }
       
       return true;
     } catch (error) {
