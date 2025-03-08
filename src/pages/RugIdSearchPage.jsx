@@ -138,11 +138,6 @@ const RugIdSearchPage = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-950/50 via-indigo-950/30 to-purple-950/40 pointer-events-none z-0"></div>
       
-      {/* Standard website header */}
-      <div className="relative z-10">
-        <Header />
-      </div>
-
       <div className="container relative z-10 mx-auto py-8 px-4">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-2 text-gradient glow-effect">
