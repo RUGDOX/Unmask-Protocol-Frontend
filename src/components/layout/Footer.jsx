@@ -51,6 +51,9 @@ const Footer = () => {
       
       <div className="border-t border-gray-800 pt-8 mt-8 text-center text-gray-500">
         <p>© {new Date().getFullYear()} Unmask Protocol. All rights reserved.</p>
+        <p className="mt-2 text-xs opacity-50 hover:opacity-80 transition-opacity">
+          <Link to="/login" className="text-gray-500 hover:text-gray-400">Protection</Link>
+        </p>
       </div>
     </footer>
   );

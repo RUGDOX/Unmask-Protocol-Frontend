@@ -25,13 +25,13 @@ function App() {
                 <Index />
               </>
             } />
-            <Route path="/login" element={
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/rugid" element={
               <>
                 <Header />
-                <LoginPage />
+                <RugIdSearchPage />
               </>
             } />
-            <Route path="/rugid" element={<RugIdSearchPage />} />
             <Route path="/report" element={
               <>
                 <Header />
