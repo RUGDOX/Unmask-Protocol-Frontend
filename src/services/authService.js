@@ -1,38 +1,33 @@
 
-import { post, get } from '../utils/api';
-import { toast } from 'sonner';
+// Simplified auth service without real backend connections
 
-// Token refresh timing constants
+// Token refresh timing constants (not actually used in mock version)
 const TOKEN_REFRESH_INTERVAL = 1000 * 60 * 14; // 14 minutes (assuming 15 min token lifespan)
 const TOKEN_EXPIRY_THRESHOLD = 1000 * 60 * 1; // 1 minute before actual expiry
 
-// Singleton to track token refresh interval
-let tokenRefreshInterval = null;
-
+// Simplified mock authentication service
 export const authService = {
   /**
-   * Login with username and password
+   * Mock login - accepts any credentials
    */
   login: async (credentials) => {
-    try {
-      const response = await post('/auth/login', credentials);
-      
-      if (!response || !response.token) {
-        throw new Error('Invalid login response');
-      }
-      
-      // Store auth data securely
-      authService.saveAuthData(response);
-      
-      // Set up token refresh mechanism
-      authService.setupTokenRefresh();
-      
-      return response;
-    } catch (error) {
-      console.error('Login failed:', error);
-      toast.error('Login failed. Please check your credentials.');
-      throw error;
-    }
+    console.log('Mock login with credentials:', credentials);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Always succeed with mock data
+    const response = {
+      token: 'mock_jwt_token_' + Date.now(),
+      expiresIn: 900, // 15 minutes
+      id: credentials.username === 'admin' ? '1' : '2',
+      role: credentials.username === 'admin' ? 'admin' : 'agent',
+    };
+    
+    // Store auth data
+    authService.saveAuthData(response);
+    
+    return response;
   },
   
   /**
@@ -76,40 +71,11 @@ export const authService = {
   },
   
   /**
-   * Setup automatic token refresh
+   * Setup automatic token refresh (simplified mock version)
    */
   setupTokenRefresh: () => {
-    // Clear any existing interval
-    if (tokenRefreshInterval) {
-      clearInterval(tokenRefreshInterval);
-    }
-    
-    // Set new interval for token refresh
-    tokenRefreshInterval = setInterval(async () => {
-      try {
-        const tokenData = JSON.parse(localStorage.getItem('auth_token'));
-        
-        if (!tokenData) {
-          clearInterval(tokenRefreshInterval);
-          return;
-        }
-        
-        const timeUntilExpiry = tokenData.expiry - Date.now();
-        
-        // Refresh when token is close to expiry
-        if (timeUntilExpiry < TOKEN_EXPIRY_THRESHOLD) {
-          const refreshed = await authService.refreshToken();
-          
-          if (!refreshed) {
-            console.warn('Token refresh failed, logging out');
-            authService.logout();
-            clearInterval(tokenRefreshInterval);
-          }
-        }
-      } catch (error) {
-        console.error('Error in token refresh cycle:', error);
-      }
-    }, TOKEN_REFRESH_INTERVAL);
+    console.log('Mock token refresh setup (not actually doing anything)');
+    // No actual token refresh in mock version
   },
   
   /**
@@ -119,30 +85,14 @@ export const authService = {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_role');
     localStorage.removeItem('user_id');
-    
-    if (tokenRefreshInterval) {
-      clearInterval(tokenRefreshInterval);
-      tokenRefreshInterval = null;
-    }
   },
   
   /**
-   * Logout the current user
+   * Mock logout 
    */
   logout: () => {
-    try {
-      // Get token before clearing
-      const token = authService.getToken();
-      
-      // Don't attempt logout API if no token
-      if (token) {
-        // Call the logout endpoint to invalidate the token on the server
-        post('/auth/logout', {}).catch(err => console.error('Logout error:', err));
-      }
-    } finally {
-      // Always clear local storage even if the API call fails
-      authService.clearAuthData();
-    }
+    console.log('Mock logout');
+    authService.clearAuthData();
   },
   
   /**
@@ -175,27 +125,47 @@ export const authService = {
   },
   
   /**
-   * Get current user profile
+   * Get current user profile (mock)
    */
   getUserProfile: async () => {
-    return await get('/auth/profile');
+    console.log('Mock get user profile');
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Return mock profile based on stored role
+    const role = localStorage.getItem('user_role');
+    const userId = localStorage.getItem('user_id');
+    
+    return {
+      id: userId || '1',
+      username: role === 'admin' ? 'admin_user' : 'agent_user',
+      email: role === 'admin' ? 'admin@example.com' : 'agent@example.com',
+      role: role || 'user',
+      firstName: role === 'admin' ? 'Admin' : 'Agent',
+      lastName: 'User',
+      createdAt: new Date().toISOString(),
+    };
   },
   
   /**
-   * Refresh token
+   * Mock refresh token
    */
   refreshToken: async () => {
-    try {
-      const response = await post('/auth/refresh-token', {});
-      
-      if (response && response.token) {
-        authService.saveAuthData(response);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Failed to refresh token:', error);
-      return false;
-    }
+    console.log('Mock token refresh');
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Always succeed with mock data
+    const response = {
+      token: 'mock_refreshed_jwt_token_' + Date.now(),
+      expiresIn: 900, // 15 minutes
+      id: localStorage.getItem('user_id') || '1',
+      role: localStorage.getItem('user_role') || 'user',
+    };
+    
+    authService.saveAuthData(response);
+    return true;
   }
 };

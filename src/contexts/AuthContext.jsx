@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
   const navigate = useNavigate();
 
-  // Function to load user profile from token
+  // Function to load user profile from localStorage
   const loadUserFromToken = async () => {
     try {
       setAuthError(null);
@@ -22,9 +22,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-
-      // Set up token refresh mechanism
-      authService.setupTokenRefresh();
 
       // Get basic user data from localStorage
       const id = authService.getUserId();
@@ -37,25 +34,16 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      // Set basic user data
+      // Set user data
       setUser({
         id,
         role,
+        // Add some default values for mock purposes
+        username: role === 'admin' ? 'admin_user' : 'agent_user',
+        email: role === 'admin' ? 'admin@example.com' : 'agent@example.com',
+        firstName: role === 'admin' ? 'Admin' : 'Agent',
+        lastName: 'User'
       });
-
-      // Optionally fetch additional user data from the server
-      try {
-        const userProfile = await authService.getUserProfile();
-        if (userProfile) {
-          setUser(prev => ({
-            ...prev,
-            ...userProfile,
-          }));
-        }
-      } catch (error) {
-        console.error("Could not fetch user profile:", error);
-        // Continue with basic user data, don't fail completely
-      }
     } catch (error) {
       console.error("Error loading user from token:", error);
       setAuthError(error.message || "Authentication error");
@@ -89,37 +77,16 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setAuthError(null);
       
-      // Environment check for development mode
-      const isDevelopment = import.meta.env.DEV || false;
-      
-      let response;
-      
-      // For demo purposes only - use in development mode
-      if (isDevelopment && (credentials.username === 'admin' || credentials.username === 'agent')) {
-        console.log('Using development mode login with mock credentials');
-        // Simulated response for demonstration
-        response = {
-          token: 'simulated_jwt_token',
-          expiresIn: 900, // 15 minutes
-          id: credentials.username === 'admin' ? '1' : '2',
-          role: credentials.username === 'admin' ? 'admin' : 'agent',
-        };
-        
-        // Store auth data
-        authService.saveAuthData(response);
-      } else {
-        // Real implementation for production
-        response = await authService.login(credentials);
-      }
-      
-      if (!response) {
-        throw new Error('Invalid response from authentication service');
-      }
+      // Simplified login that always succeeds
+      const response = await authService.login(credentials);
       
       setUser({
         id: response.id,
         role: response.role,
         username: credentials.username,
+        firstName: response.role === 'admin' ? 'Admin' : 'Agent',
+        lastName: 'User',
+        email: `${credentials.username}@example.com`
       });
       
       toast.success(`Welcome back, ${credentials.username}!`);
