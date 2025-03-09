@@ -1,302 +1,167 @@
 
-/**
- * Utility functions for API requests
- */
-import { authService } from '../services/authService';
+// Base API utility for making HTTP requests
 
-// Determine API base URL based on environment
-// In production, this will use the environment variable set in Vercel
-// In development, it falls back to the local development API
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
-                    (import.meta.env.PROD ? 
-                     'https://api.unmask.io' : 
-                     'http://localhost:3000');
+// Get base URL from environment variable or default for local development
+const getBaseUrl = () => {
+  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+};
 
-console.log('API BASE URL:', API_BASE_URL);
+// Add request timeout
+const TIMEOUT_MS = 30000; // 30 seconds
 
-// Simple in-memory cache
-const apiCache = new Map();
-const CACHE_DURATION = 60000; // 1 minute cache duration
+// Create a promise that rejects after specified time
+const timeoutPromise = (ms) => {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Request timed out after ${ms}ms`));
+    }, ms);
+  });
+};
 
-/**
- * Generic fetch wrapper with error handling and caching
- */
-async function fetchWithAuth(endpoint, options = {}, useCache = false) {
-  // Check cache for GET requests if caching is enabled
-  const cacheKey = `${options.method || 'GET'}-${endpoint}-${JSON.stringify(options.body || {})}`;
+// Perform fetch with timeout
+const fetchWithTimeout = (url, options) => {
+  return Promise.race([
+    fetch(url, options),
+    timeoutPromise(TIMEOUT_MS)
+  ]);
+};
+
+// Handle API response
+const handleResponse = async (response) => {
+  // Always parse the response, even for error responses
+  const contentType = response.headers.get('content-type');
+  const isJson = contentType && contentType.includes('application/json');
+  const data = isJson ? await response.json() : await response.text();
   
-  if (useCache && (options.method === undefined || options.method === 'GET')) {
-    const cachedResponse = apiCache.get(cacheKey);
-    if (cachedResponse && Date.now() < cachedResponse.expiry) {
-      console.log(`[API] Using cached response for ${endpoint}`);
-      return cachedResponse.data;
-    }
+  // If the response isn't successful, throw an error
+  if (!response.ok) {
+    const error = {
+      status: response.status,
+      statusText: response.statusText,
+      data: data,
+    };
+    console.error('API error:', error);
+    throw error;
   }
+  
+  return data;
+};
 
+// Add authentication header if token exists
+const getAuthHeader = () => {
   try {
-    // Add performance mark for request start
-    const perfMark = `api-${Date.now()}-${endpoint.replace(/\//g, '-')}`;
-    performance.mark(`${perfMark}-start`);
+    const tokenData = JSON.parse(localStorage.getItem('auth_token'));
+    if (tokenData && tokenData.value) {
+      return { 'Authorization': `Bearer ${tokenData.value}` };
+    }
+  } catch (error) {
+    console.error('Error reading auth token:', error);
+  }
+  return {};
+};
 
-    // Add auth token if available
-    const token = authService.getToken();
+/**
+ * Generic function to make API requests
+ */
+async function request(endpoint, options = {}) {
+  try {
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}${endpoint}`;
+    
+    // Default headers
     const headers = {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...getAuthHeader(),
       ...options.headers,
     };
-
-    // Log API calls in development mode
-    if (import.meta.env.DEV) {
-      console.log(`[API] ${options.method || 'GET'} request to ${endpoint}`);
-      console.log(`[API] Full URL: ${API_BASE_URL}${endpoint}`);
-    }
-
-    // In development mode, simulate API response for certain endpoints if no real API is available
-    if (import.meta.env.DEV && !options.forceReal) {
-      const mockResponse = await getMockResponse(endpoint, options.method || 'GET', options.body);
-      if (mockResponse !== null) {
-        await new Promise(resolve => setTimeout(resolve, 600)); // Simulate network delay
-        return mockResponse;
-      }
-    }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    
+    const config = {
       ...options,
       headers,
-    });
-
-    // Add performance mark for request end and measure
-    performance.mark(`${perfMark}-end`);
-    performance.measure(`API Call to ${endpoint}`, `${perfMark}-start`, `${perfMark}-end`);
+    };
     
-    // Log slow requests (over 1s)
-    const measure = performance.getEntriesByName(`API Call to ${endpoint}`).pop();
-    if (measure && measure.duration > 1000) {
-      console.warn(`[API] Slow request to ${endpoint}: ${measure.duration.toFixed(2)}ms`);
+    // Log outgoing request (for development)
+    if (import.meta.env.DEV) {
+      console.log(`API ${options.method || 'GET'} request:`, url, config);
     }
-
-    // Check if there was a network error
-    if (!response) {
-      throw new Error('Network error - unable to connect to server');
+    
+    const response = await fetchWithTimeout(url, config);
+    const data = await handleResponse(response);
+    
+    // Log response (for development)
+    if (import.meta.env.DEV) {
+      console.log(`API ${options.method || 'GET'} response:`, data);
     }
-
-    if (response.status === 401) {
-      // Handle unauthorized (token expired, etc.)
-      // Try to refresh token once
-      const refreshed = await authService.refreshToken();
-      if (refreshed) {
-        // Retry the request with new token
-        return fetchWithAuth(endpoint, options, false); // Don't use cache for retry
-      } else {
-        // If refresh failed, clear auth and redirect
-        authService.clearAuthData();
-        window.location.href = '/login?session=expired';
-        throw new Error('Authentication expired. Please login again.');
-      }
-    }
-
-    if (response.status === 403) {
-      // Handle forbidden
-      throw new Error('You do not have permission to access this resource');
-    }
-
-    if (!response.ok) {
-      let errorMessage = `API error: ${response.status}`;
-      
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorMessage;
-      } catch (e) {
-        // If parsing JSON fails, use default error message
-      }
-      
-      throw new Error(errorMessage);
-    }
-
-    // If response status is 204 No Content
-    if (response.status === 204) {
-      return null;
-    }
-
-    // Parse response based on content type
-    let data;
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      // Handle non-JSON responses
-      data = await response.text();
-    }
-
-    // Cache the successful response for GET requests if caching is enabled
-    if (useCache && (options.method === undefined || options.method === 'GET')) {
-      apiCache.set(cacheKey, {
-        data,
-        expiry: Date.now() + CACHE_DURATION
-      });
-    }
-
+    
     return data;
   } catch (error) {
+    // Enhanced error handling
     console.error('API request failed:', error);
+    
+    // If error occurred during fetch or parsing
+    if (error.status === undefined) {
+      throw {
+        status: 0,
+        statusText: 'Network Error',
+        message: error.message || 'Failed to connect to the server',
+        original: error,
+      };
+    }
+    
+    // If the server returned an error
     throw error;
   }
 }
 
 /**
- * Mock response function for development without a real API
- * This can be expanded to handle more endpoints as needed
+ * GET request
  */
-async function getMockResponse(endpoint, method, body) {
-  // Only use mock responses in development
-  if (!import.meta.env.DEV) return null;
-
-  console.log(`[MOCK API] Handling ${method} request to ${endpoint}`);
-
-  // Auth endpoints
-  if (endpoint === '/auth/login' && method === 'POST') {
-    const parsedBody = typeof body === 'string' ? JSON.parse(body) : body;
-    if (parsedBody.username === 'admin') {
-      return {
-        token: 'simulated_admin_jwt_token',
-        expiresIn: 900,
-        id: '1',
-        role: 'admin',
-      };
-    } else if (parsedBody.username === 'agent') {
-      return {
-        token: 'simulated_agent_jwt_token',
-        expiresIn: 900,
-        id: '2',
-        role: 'agent',
-      };
-    }
-    throw new Error('Invalid credentials');
-  }
-
-  if (endpoint === '/auth/profile' && method === 'GET') {
-    return {
-      username: localStorage.getItem('user_role') === 'admin' ? 'admin' : 'agent',
-      email: localStorage.getItem('user_role') === 'admin' ? 'admin@unmask.io' : 'agent@unmask.io',
-      firstName: localStorage.getItem('user_role') === 'admin' ? 'Admin' : 'Agent',
-      lastName: 'User',
-    };
-  }
-
-  if (endpoint === '/auth/refresh-token' && method === 'POST') {
-    const role = localStorage.getItem('user_role');
-    if (role) {
-      return {
-        token: `simulated_${role}_refreshed_jwt_token`,
-        expiresIn: 900,
-        id: role === 'admin' ? '1' : '2',
-        role: role,
-      };
-    }
-    throw new Error('Invalid refresh token');
-  }
-
-  // More mock endpoints can be added here as needed
-  
-  // Return null to indicate no mock available, should use real API
-  console.log('[MOCK API] No mock available, will attempt real API call');
-  return null;
+export async function get(endpoint, options = {}) {
+  return request(endpoint, {
+    ...options,
+    method: 'GET',
+  });
 }
 
 /**
- * Adds retry functionality to API requests
+ * POST request
  */
-async function fetchWithRetry(endpoint, options = {}, useCache = false, retries = 3, backoff = 300) {
-  try {
-    return await fetchWithAuth(endpoint, options, useCache);
-  } catch (error) {
-    if (retries <= 1) throw error;
-    
-    // Wait for backoff milliseconds
-    await new Promise(resolve => setTimeout(resolve, backoff));
-    
-    // Retry the request with an exponential backoff
-    return fetchWithRetry(
-      endpoint, 
-      options,
-      false, // Don't use cache for retries
-      retries - 1, 
-      backoff * 2
-    );
-  }
-}
-
-/**
- * Clear cache for specific endpoint or all cache if no endpoint provided
- */
-function clearCache(endpoint = null) {
-  if (endpoint) {
-    // Clear specific endpoint cache entries
-    for (const key of apiCache.keys()) {
-      if (key.includes(endpoint)) {
-        apiCache.delete(key);
-      }
-    }
-  } else {
-    // Clear entire cache
-    apiCache.clear();
-  }
-}
-
-/**
- * GET request helper with optional caching
- */
-export const get = (endpoint, useCache = true, retries = 3) => 
-  fetchWithRetry(endpoint, {}, useCache, retries);
-
-/**
- * POST request helper
- */
-export const post = (endpoint, data, retries = 3) => 
-  fetchWithRetry(endpoint, {
+export async function post(endpoint, data, options = {}) {
+  return request(endpoint, {
+    ...options,
     method: 'POST',
     body: JSON.stringify(data),
-  }, false, retries);
+  });
+}
 
 /**
- * PUT request helper
+ * PUT request
  */
-export const put = (endpoint, data, retries = 3) =>
-  fetchWithRetry(endpoint, {
+export async function put(endpoint, data, options = {}) {
+  return request(endpoint, {
+    ...options,
     method: 'PUT',
     body: JSON.stringify(data),
-  }, false, retries);
+  });
+}
 
 /**
- * DELETE request helper
+ * DELETE request
  */
-export const del = (endpoint, retries = 3) =>
-  fetchWithRetry(endpoint, {
+export async function del(endpoint, options = {}) {
+  return request(endpoint, {
+    ...options,
     method: 'DELETE',
-  }, false, retries);
+  });
+}
 
 /**
- * Handle offline status and reconnection
+ * PATCH request
  */
-export const setupOfflineDetection = () => {
-  window.addEventListener('online', () => {
-    console.log('Back online');
-    // Refresh data or notify components to refresh
-    window.dispatchEvent(new CustomEvent('app:online'));
-    // Clear cache when coming back online to ensure fresh data
-    clearCache();
+export async function patch(endpoint, data, options = {}) {
+  return request(endpoint, {
+    ...options,
+    method: 'PATCH',
+    body: JSON.stringify(data),
   });
-
-  window.addEventListener('offline', () => {
-    console.log('Went offline');
-    // Notify user they're offline
-    window.dispatchEvent(new CustomEvent('app:offline'));
-  });
-};
-
-// Initialize offline detection
-setupOfflineDetection();
-
-// Export cache utilities
-export { clearCache };
+}
