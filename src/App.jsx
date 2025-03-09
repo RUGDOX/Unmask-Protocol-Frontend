@@ -24,6 +24,7 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex-grow">
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={
               <>
                 <Header />
@@ -87,13 +88,14 @@ function App() {
             <Route path="/auth-redirect" element={
               <ProtectedRoute>
                 {({ user }) => {
-                  if (user.role === 'admin') return <Navigate to="/admin" replace />;
-                  if (user.role === 'agent') return <Navigate to="/investigations" replace />;
+                  if (user?.role === 'admin') return <Navigate to="/admin" replace />;
+                  if (user?.role === 'agent') return <Navigate to="/investigations" replace />;
                   return <Navigate to="/" replace />;
                 }}
               </ProtectedRoute>
             } />
             
+            {/* 404 Route - must be last */}
             <Route path="*" element={
               <>
                 <Header />

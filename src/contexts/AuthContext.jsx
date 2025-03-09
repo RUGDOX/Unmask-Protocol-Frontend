@@ -9,11 +9,14 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
   const navigate = useNavigate();
 
   // Function to load user profile from token
   const loadUserFromToken = async () => {
     try {
+      setAuthError(null);
+      
       // Check if token exists and is valid
       if (!authService.isAuthenticated()) {
         setLoading(false);
@@ -26,6 +29,13 @@ export const AuthProvider = ({ children }) => {
       // Get basic user data from localStorage
       const id = authService.getUserId();
       const role = authService.getUserRole();
+
+      if (!id || !role) {
+        console.warn("Token exists but unable to extract user data. Clearing auth data.");
+        authService.clearAuthData();
+        setLoading(false);
+        return;
+      }
 
       // Set basic user data
       setUser({
@@ -44,10 +54,11 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Could not fetch user profile:", error);
-        // Continue with basic user data
+        // Continue with basic user data, don't fail completely
       }
     } catch (error) {
       console.error("Error loading user from token:", error);
+      setAuthError(error.message || "Authentication error");
       authService.clearAuthData();
     } finally {
       setLoading(false);
@@ -76,14 +87,16 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setLoading(true);
+      setAuthError(null);
       
       // Environment check for development mode
-      const isDevelopment = import.meta.env.DEV;
+      const isDevelopment = import.meta.env.DEV || false;
       
       let response;
       
       // For demo purposes only - use in development mode
       if (isDevelopment && (credentials.username === 'admin' || credentials.username === 'agent')) {
+        console.log('Using development mode login with mock credentials');
         // Simulated response for demonstration
         response = {
           token: 'simulated_jwt_token',
@@ -97,6 +110,10 @@ export const AuthProvider = ({ children }) => {
       } else {
         // Real implementation for production
         response = await authService.login(credentials);
+      }
+      
+      if (!response) {
+        throw new Error('Invalid response from authentication service');
       }
       
       setUser({
@@ -120,6 +137,7 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Login failed:', error);
+      setAuthError(error.message || 'Authentication failed');
       toast.error(`Login failed: ${error.message || 'Please check your credentials.'}`);
       return false;
     } finally {
@@ -128,10 +146,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    authService.logout();
-    setUser(null);
-    toast.info('You have been logged out');
-    navigate('/login');
+    try {
+      authService.logout();
+      setUser(null);
+      toast.info('You have been logged out');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force logout even if there's an error
+      setUser(null);
+      localStorage.clear();
+      navigate('/login');
+    }
   };
 
   const value = {
@@ -139,6 +165,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    error: authError,
     isAuthenticated: authService.isAuthenticated,
     hasRole: authService.hasRole,
   };
