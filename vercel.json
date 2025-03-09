@@ -11,7 +11,13 @@
       ]
     },
     {
-      "source": "/(.+\\.[a-zA-Z0-9]+)$",
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*\\.[a-zA-Z0-9]{8}\\.(js|css))",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
@@ -19,5 +25,6 @@
   ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "trailingSlash": false
 }

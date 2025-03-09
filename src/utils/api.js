@@ -1,9 +1,17 @@
 
 // Base API utility for making HTTP requests
 
-// Get base URL from environment variable or default for local development
+// Get base URL from environment variable or default for development/production
 const getBaseUrl = () => {
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+  // If explicitly set in environment, use that
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // Fallback based on environment - this helps in both development and production
+  return window.location.origin.includes('localhost') ? 
+    'http://localhost:3000/api' : 
+    `${window.location.origin}/api`;
 };
 
 // Add request timeout
@@ -31,7 +39,15 @@ const handleResponse = async (response) => {
   // Always parse the response, even for error responses
   const contentType = response.headers.get('content-type');
   const isJson = contentType && contentType.includes('application/json');
-  const data = isJson ? await response.json() : await response.text();
+  
+  let data;
+  try {
+    data = isJson ? await response.json() : await response.text();
+  } catch (e) {
+    console.error('Failed to parse response:', e);
+    // Return empty data rather than failing completely
+    data = isJson ? {} : '';
+  }
   
   // If the response isn't successful, throw an error
   if (!response.ok) {

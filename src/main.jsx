@@ -29,7 +29,7 @@ const renderApp = () => {
       // Use a slight delay to ensure content is rendered
       setTimeout(() => {
         loadingScreen.style.display = 'none';
-      }, 500);
+      }, 800); // Increased timeout for slower connections
     }
   } catch (error) {
     console.error("Error rendering the application:", error);
@@ -40,6 +40,9 @@ const renderApp = () => {
         <h2>Application Error</h2>
         <p>We encountered a problem loading the application. Please try refreshing the page.</p>
         <p><small>Error details: ${error.message || 'Unknown error'}</small></p>
+        <button onclick="window.location.reload()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; margin-top: 16px; cursor: pointer;">
+          Refresh Page
+        </button>
       </div>
     `;
     

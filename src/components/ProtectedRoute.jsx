@@ -1,12 +1,33 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
+import ApiConnectionError from './ApiConnectionError';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { isAuthenticated, hasRole, loading, user, error } = useAuth();
   const location = useLocation();
+  const [retryCount, setRetryCount] = useState(0);
+  const [showError, setShowError] = useState(false);
+
+  // Show connection error after multiple attempts or certain error types
+  useEffect(() => {
+    if (error && (
+      error.includes('Failed to fetch') || 
+      error.includes('Network Error') ||
+      error.includes('connection')
+    )) {
+      // Only show error after a few seconds to avoid flash on normal loading
+      const timer = setTimeout(() => {
+        setShowError(true);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    setShowError(false);
+  }, [error, retryCount]);
 
   // Check authentication on route access
   useEffect(() => {
@@ -23,6 +44,13 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     }
   }, [loading, isAuthenticated, hasRole, requiredRole]);
 
+  // Handle retry logic
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    setShowError(false);
+    window.location.reload();
+  };
+
   // Show loading state if auth is still being determined
   if (loading) {
     return (
@@ -33,7 +61,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   // Show error state if there was an authentication error
-  if (error) {
+  if (error && showError) {
+    return <ApiConnectionError onRetry={handleRetry} error={error} />;
+  }
+
+  // Show error UI
+  if (error && !showError) {
     return (
       <div className="flex flex-col justify-center items-center h-screen p-4">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md">
