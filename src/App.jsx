@@ -19,6 +19,7 @@ const ApiKeyRequestPage = lazy(() => import('./pages/ApiKeyRequestPage'));
 const ApiInfoPage = lazy(() => import('./pages/ApiInfoPage'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AgentInvestigationPage = lazy(() => import('./pages/AgentInvestigationPage'));
+const TrustAgreementPage = lazy(() => import('./pages/TrustAgreementPage'));
 
 // Loading fallback
 const LoadingFallback = () => (
@@ -116,6 +117,12 @@ function App() {
                     <ApiInfoPage />
                   </Suspense>
                 </>
+              } />
+              
+              <Route path="/trust-agreement" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <TrustAgreementPage />
+                </Suspense>
               } />
               
               <Route path="/unauthorized" element={

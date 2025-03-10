@@ -1,7 +1,25 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { AlertCircle, CheckCircle2, Upload, FileText, ArrowRight, Fingerprint, Shield, Lock } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
+import { useNavigate, Link } from "react-router-dom";
+import { 
+  AlertCircle, 
+  CheckCircle2, 
+  Upload, 
+  FileText, 
+  ArrowRight, 
+  Fingerprint, 
+  Shield, 
+  Lock,
+  FilePenLine
+} from "lucide-react";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent, 
+  CardFooter 
+} from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -9,7 +27,6 @@ import { Textarea } from "./ui/textarea";
 import { projectsService } from "../services/projectsService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { useNavigate } from "react-router-dom";
 
 const ProjectRegistrationForm = () => {
   const navigate = useNavigate();
@@ -541,24 +558,51 @@ const ProjectRegistrationForm = () => {
               )}
               
               {rugId && isEligible && (
-                <Alert className="mt-4 bg-green-50 border-green-200">
-                  <Fingerprint className="h-4 w-4" />
-                  <AlertTitle>RugID Generated</AlertTitle>
-                  <AlertDescription className="font-mono">
-                    Your unique RugID: {rugId}
-                  </AlertDescription>
-                  <p className="text-xs mt-1 text-muted-foreground">
-                    This ID is unique to you and cannot be reverse-engineered to reveal your personal information.
-                  </p>
-                </Alert>
+                <>
+                  <Alert className="mt-4 bg-green-50 border-green-200">
+                    <Fingerprint className="h-4 w-4" />
+                    <AlertTitle>RugID Generated</AlertTitle>
+                    <AlertDescription className="font-mono">
+                      Your unique RugID: {rugId}
+                    </AlertDescription>
+                    <p className="text-xs mt-1 text-muted-foreground">
+                      This ID is unique to you and cannot be reverse-engineered to reveal your personal information.
+                    </p>
+                  </Alert>
+                  
+                  <Alert className="mt-4">
+                    <FilePenLine className="h-4 w-4" />
+                    <AlertTitle>Trust Agreement Required</AlertTitle>
+                    <AlertDescription>
+                      To complete your RugID registration, you must review and sign the Trust Agreement.
+                      <div className="mt-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          asChild
+                        >
+                          <Link to="/trust-agreement">
+                            <FileText className="mr-2 h-4 w-4" />
+                            Proceed to Trust Agreement
+                          </Link>
+                        </Button>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                </>
               )}
 
               <div className="flex justify-between mt-6">
                 <Button type="button" variant="outline" onClick={prevStep}>
                   Back
                 </Button>
-                <Button type="submit" disabled={!isEligible || !rugId}>
-                  Submit Registration
+                <Button 
+                  type="button" 
+                  onClick={() => navigate('/trust-agreement')} 
+                  disabled={!isEligible || !rugId}
+                >
+                  Next: Trust Agreement
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </TabsContent>

@@ -6,7 +6,9 @@
   ],
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/(.+\\.[a-z]+)$", "dest": "/$1" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/(.*\\.[a-zA-Z0-9]{1,10})$", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
