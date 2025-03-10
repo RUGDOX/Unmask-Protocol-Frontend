@@ -13,7 +13,8 @@ import {
   Lock, 
   Shield, 
   UserCheck,
-  LucideFingerprint
+  Calendar,
+  Info
 } from 'lucide-react';
 import { 
   Card, 
@@ -28,6 +29,8 @@ import { Label } from './ui/label';
 import { Checkbox } from './ui/checkbox';
 import { ScrollArea } from './ui/scroll-area';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
+import { Separator } from "./ui/separator";
+import { Input } from "./ui/input";
 
 const TrustAgreementForm = () => {
   const navigate = useNavigate();
@@ -40,8 +43,15 @@ const TrustAgreementForm = () => {
     fullName: 'John Doe', // This would be populated from the verification data
     idType: 'Passport',
     idNumber: 'P123456789',
-    address: '123 Blockchain St, Crypto City, CC 12345'
+    address: '123 Blockchain St, Crypto City, CC 12345',
+    isOver18: true,
+    verificationId: 'ID-V-7891011',
+    authCode: 'AUTH-123456'
   });
+  
+  // For name input in the signature section
+  const [nameInput, setNameInput] = useState('');
+  const [signatureName, setSignatureName] = useState('');
 
   // Signature pad reference
   const signaturePad = useRef(null);
@@ -82,6 +92,12 @@ const TrustAgreementForm = () => {
       return;
     }
     
+    if (!nameInput.trim()) {
+      toast.error('Please enter your full name for the signature');
+      return;
+    }
+    
+    setSignatureName(nameInput);
     setAgreementSigned(true);
     toast.success('Agreement successfully signed!');
   };
@@ -124,126 +140,110 @@ const TrustAgreementForm = () => {
     }
   };
 
-  // The trust agreement text - this would normally be loaded from a CMS or API
+  const handleDownloadAgreement = () => {
+    // In a real app, this would generate and download a PDF
+    toast.info('This would download the agreement as a PDF in a production environment');
+  };
+
+  // The updated trust agreement text
   const trustAgreementText = `
-UNMASK PROTOCOL TRUST AGREEMENT
+**RugDox LLC User Agreement**
 
-THIS TRUST AGREEMENT (the "Agreement") is entered into on the date of electronic signature below,
+**Purpose & Commitment**
 
-BETWEEN:
+RugDox LLC's RugID system is designed to promote trust and protect communities by ensuring individuals act with integrity. The purpose of this system is to provide community members with confidence that those they interact with are accountable. By securely vaulting your data, RugDox LLC aims to deter malicious behavior while preserving your privacy and security. We prioritize your security and use advanced data protection methods to safeguard your information.
 
-UNMASK PROTOCOL, a decentralized identity verification and fraud prevention protocol ("Unmask Protocol"),
+Your data will only be used if there is confirmed evidence linking your identity to activities that violate this Agreement. Our goal is not to punish, but to maintain a fair and trustworthy community.
 
-AND
+---
 
-THE INDIVIDUAL OR ENTITY identified through the verification process and whose electronic signature appears below (the "Signatory").
+**Integrity Commitment**
 
-WHEREAS:
+This Agreement is fundamentally based on integrity. While RugDox LLC's primary objective is to prevent fraud and crime specifically within Web3 industries (including crypto, NFTs, and digital asset-related ventures), the principles of trust and accountability apply more broadly. 
 
-A. Unmask Protocol provides a blockchain-based identity verification system that issues unique identifiers (RugIDs) to verified entities;
+If a User is found to have engaged in fraudulent behavior outside the Web3 space — whether in traditional industries, financial schemes, or other misconduct — such actions inherently compromise the trust that this Agreement is designed to build. While such non-Web3-related fraudulent behavior may not automatically invalidate this Agreement, it reflects a clear violation of the trust expected of a Web3 community leader, project founder, or administrator. RugDox LLC reserves the right to take such violations into account when assessing the User's standing in the RugID system and the community.
 
-B. The Signatory wishes to obtain a RugID for use in Web3 projects after completing identity verification;
+---
 
-C. This Agreement establishes the terms under which the RugID is issued and the obligations of the Signatory.
+**User Responsibilities and Liabilities**
 
-NOW THEREFORE, in consideration of the mutual covenants contained herein, the parties agree as follows:
+2.1 **Truthful Information:** Users must provide truthful, accurate, and complete information. This includes, but is not limited to, verified address details, picture identification, and additional documentation as requested by RugDox LLC. Providing false information may result in penalties outlined herein.
 
-1. DEFINITIONS
+2.2 **Commitment to Integrity:** Users agree to act in good faith and refrain from activities that could be perceived as fraudulent or harmful to their community. This includes actions that could result in financial loss or reputation damage to others.
 
-1.1 "RugID" means the unique identifier issued by Unmask Protocol after successful identity verification.
+2.3 **Fraud Prevention & Accountability:** RugDox LLC will only act to confirm and verify data when potential fraudulent activity is identified. Fraudulent activities include, but are not limited to, actions involving deception, misrepresentation, or misconduct by Web3 project owners, founders, or admins in crypto, NFTs, or other digital asset-related ventures. If the User is linked to verifiable fraudulent actions, the Company may collect and report relevant data to appropriate authorities or, in certain cases, publicly disclose data through the unMASK Protocol to warn affected parties. 
 
-1.2 "Verification Data" means the personal information provided by the Signatory during the identity verification process.
+**Note:** This is not intended to assume guilt but to provide verifiable data that authorities may use in their investigations. For detailed information about the unMASK Protocol process, please reference our website once available.
 
-1.3 "Dead Man's Switch" means the security mechanism that protects Verification Data from unauthorized access.
+2.4 **Indemnification:** Users agree to indemnify, defend, and hold harmless RugDox LLC from claims, liabilities, damages, or costs resulting from their breach of this Agreement or verified fraudulent activity.
 
-1.4 "Control Number" means the unique tracking number assigned to this Agreement.
+---
 
-2. IDENTITY VERIFICATION AND RUGID ISSUANCE
+**Data Collection and Security**
 
-2.1 The Signatory confirms that all Verification Data provided is true, accurate, and complete.
+3.1 **Data Security Measures:** RugDox LLC protects your personal data using:
 
-2.2 The Signatory acknowledges that the RugID is cryptographically derived from the Verification Data but cannot be reverse-engineered to reveal that data.
+- A two-layer Hybrid Encryption followed by advanced post-quantum encryption.
+- Offensive protection methods designed to ensure the vault's data integrity at all times.
+- Industry-standard security protocols designed to minimize the risk of data breaches.
 
-2.3 The Signatory agrees that the RugID will be publicly visible and associated with their Web3 projects.
+3.2 **User Assurance:** While RugDox LLC takes significant measures to protect your data, no security system is infallible. By agreeing to this Agreement, the User acknowledges these risks.
 
-3. TERMS OF USE
+---
 
-3.1 The Signatory shall not:
-   (a) Transfer, sell, or otherwise distribute their RugID to any other party;
-   (b) Use the RugID for any fraudulent, deceptive, or illegal purpose;
-   (c) Attempt to create multiple RugIDs using different or false identities.
+**Cancellation, Investigations & Data Use**
 
-3.2 The Signatory shall notify Unmask Protocol immediately if they believe their RugID has been compromised.
+13.1 **No Right to Cancellation During Investigation:** To ensure the integrity of the unMASK Protocol, the User agrees they may not cancel or alter their RugID registration during an ongoing investigation if linked to suspected fraudulent activities. This measure is critical to protecting communities and ensuring due diligence in fraud prevention.
 
-4. DATA SECURITY AND PRIVACY
+13.2 **Limited Right to Withdraw Consent:** The User understands that consent for data collection, processing, and storage may not be withdrawn once an investigation is activated or if such withdrawal would interfere with ongoing legal processes.
 
-4.1 Unmask Protocol will store all Verification Data in secure, encrypted vaults protected by a Dead Man's Switch mechanism.
+13.3 **Corrective Action in Case of Error:** Users have the right to submit evidence proving they were incorrectly linked to fraudulent activities. In such cases, RugDox LLC will promptly review the evidence, correct the record, and restore the User's standing in the community.
 
-4.2 The Signatory's Verification Data will not be accessible to the public or to Unmask Protocol itself except under the conditions specified in Section 5.
+---
 
-4.3 Unmask Protocol will not sell, rent, or otherwise commercialize the Signatory's Verification Data.
+**User Bill of Rights**
 
-5. LEGAL COMPLIANCE AND DISCLOSURE
+To build user trust, RugDox LLC outlines the following rights for all users:
 
-5.1 The Signatory acknowledges that their Verification Data may be disclosed:
-   (a) In response to a valid court order or subpoena;
-   (b) To law enforcement agencies investigating fraud or other criminal activity;
-   (c) As required by applicable laws and regulations.
+- **Transparency:** Users will be informed when their data is being reviewed or disclosed in accordance with the unMASK Protocol.
+- **Correction of Errors:** Users have the right to present verified documentation to correct inaccuracies in the RugID system.
+- **Security Updates:** RugDox LLC will provide regular security updates and notify users of changes to its data protection methods.
+- **Clear Appeal Process:** If a User disagrees with an outcome linked to suspected fraudulent activity, they have the right to appeal the decision through a dedicated review process. Please note that in rare circumstances, law enforcement authorities may require RugDox LLC to provide all investigative information, including securely vaulted data, in compliance with applicable laws and regulations. Such requests are beyond our control and may limit or prevent our ability to proceed with the appeal process as outlined in this Agreement.
+---
 
-5.2 Such disclosure shall only occur through the proper legal channels and with appropriate safeguards.
+**Summary of Commitments**
 
-6. REPRESENTATIONS AND WARRANTIES
+By signing this Agreement, the User acknowledges that RugDox LLC is dedicated to building a safe, fraud-resistant environment that values fairness, accountability, and the protection of personal data. The User agrees to cooperate with the Company in maintaining these principles.
 
-6.1 The Signatory represents and warrants that:
-   (a) They have the legal capacity to enter into this Agreement;
-   (b) They are at least 18 years of age or the age of majority in their jurisdiction;
-   (c) They are not using the RugID to evade any legal obligations or to facilitate any illegal activity.
+---
 
-7. TERM AND TERMINATION
+**IN WITNESS WHEREOF, the parties hereto have executed this User Agreement as of the date first above written.**
 
-7.1 This Agreement shall remain in effect for as long as the Signatory's RugID remains active.
+**RugDox LLC**
+By: RugDox LLC
+Date: ${new Date().toLocaleDateString()}
 
-7.2 Unmask Protocol may revoke the Signatory's RugID if:
-   (a) The Signatory breaches any provision of this Agreement;
-   (b) The Signatory is found to have provided false Verification Data;
-   (c) Required by law or court order.
+**User**
+By ID Agent
+ID-V: ${userIdentityInfo.verificationId}
+Auth: ${userIdentityInfo.authCode}
 
-8. LIMITATION OF LIABILITY
-
-8.1 Unmask Protocol shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, arising out of or in connection with this Agreement.
-
-8.2 In no event shall Unmask Protocol's total liability to the Signatory exceed the amount paid by the Signatory for the RugID issuance.
-
-9. MISCELLANEOUS
-
-9.1 This Agreement constitutes the entire agreement between the parties concerning the subject matter hereof.
-
-9.2 This Agreement may not be modified except in writing signed by both parties.
-
-9.3 The validity, interpretation, and performance of this Agreement shall be governed by the laws of the jurisdiction in which Unmask Protocol is established.
-
-9.4 If any provision of this Agreement is found to be unenforceable, the remaining provisions shall remain in full force and effect.
-
-BY ELECTRONICALLY SIGNING BELOW, THE SIGNATORY ACKNOWLEDGES THAT THEY HAVE READ AND UNDERSTOOD THIS AGREEMENT AND AGREE TO BE BOUND BY ITS TERMS.
-
-[ELECTRONIC SIGNATURE SPACE]
-
-Date: [CURRENT DATE]
-
-RugID: [RUGID]
-
-Control Number: [CONTROL NUMBER]
+By: ${signatureName || '_________________________'}
+Name: ${signatureName || '_________________________'}
+18+: ${userIdentityInfo.isOver18 ? 'Yes' : 'No'}
+RugID: ${rugId}
+Date: ${new Date().toLocaleDateString()}
 `;
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto">
       <CardHeader className="bg-muted/50">
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-6 w-6 text-primary" />
-          Unmask Protocol Trust Agreement
+          RugDox LLC User Agreement
         </CardTitle>
         <CardDescription>
-          Please review the agreement carefully before signing.
+          Please review the agreement carefully before signing. This is a legally binding document.
         </CardDescription>
       </CardHeader>
       
@@ -251,19 +251,33 @@ Control Number: [CONTROL NUMBER]
         <CardContent className="pt-6 space-y-6">
           {/* Agreement Text Display */}
           <div className="space-y-2">
-            <Label className="text-lg">Agreement Terms</Label>
-            <ScrollArea className="h-64 w-full border rounded-md p-4 bg-white text-black">
+            <div className="flex justify-between items-center">
+              <Label className="text-lg">Agreement Terms</Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={handleDownloadAgreement}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Agreement
+              </Button>
+            </div>
+            <ScrollArea className="h-72 w-full border rounded-md p-4 bg-white text-black">
               <div className="whitespace-pre-line">
-                {trustAgreementText.replace('[RUGID]', rugId).replace('[CONTROL NUMBER]', controlNumber).replace('[CURRENT DATE]', new Date().toLocaleDateString())}
+                {trustAgreementText}
               </div>
             </ScrollArea>
           </div>
           
           {/* User Identity Information Box */}
           <div className="space-y-2">
-            <Label className="text-lg">Verified Identity Information</Label>
+            <div className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-primary" />
+              <Label className="text-lg">Verified Identity Information</Label>
+            </div>
             <div className="border p-4 rounded-md bg-muted/20">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium">Full Name:</p>
                   <p className="text-sm">{userIdentityInfo.fullName}</p>
@@ -281,52 +295,85 @@ Control Number: [CONTROL NUMBER]
                   <p className="text-sm">{truncateText(userIdentityInfo.address, 20)}</p>
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-border/30 flex justify-between items-center">
+              <Separator className="my-3" />
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <div className="flex items-center gap-2">
                   <Fingerprint className="h-4 w-4 text-primary" />
                   <span className="text-sm font-mono">RugID: {rugId}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Date: {new Date().toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4 text-primary" />
                   <span className="text-sm font-mono">Control #: {controlNumber}</span>
                 </div>
               </div>
+              <Separator className="my-3" />
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-mono">ID-V: {userIdentityInfo.verificationId}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-mono">Auth: {userIdentityInfo.authCode}</span>
+                </div>
+              </div>
             </div>
           </div>
           
           {/* Signature Pad */}
-          <div className="space-y-2">
-            <Label className="text-lg">Signature</Label>
-            <div className="border rounded-md bg-white p-1">
-              <SignatureCanvas
-                ref={signaturePad}
-                penColor="black"
-                canvasProps={{
-                  width: 500,
-                  height: 200,
-                  className: 'signature-canvas w-full'
-                }}
-              />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Fingerprint className="h-5 w-5 text-primary" />
+              <Label className="text-lg">Your Signature</Label>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm"
-                onClick={clearSignature}
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Clear Signature
-              </Button>
-              <Button 
-                type="button" 
-                size="sm"
-                onClick={handleSignAgreement}
-                disabled={agreementSigned}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                {agreementSigned ? 'Signed' : 'Sign Agreement'}
-              </Button>
+            
+            <div className="space-y-4">
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="signature-name">Your Full Legal Name</Label>
+                <Input
+                  id="signature-name"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  placeholder="Enter your full legal name"
+                  className="max-w-md"
+                />
+              </div>
+              
+              <div className="border rounded-md bg-white p-1">
+                <SignatureCanvas
+                  ref={signaturePad}
+                  penColor="black"
+                  canvasProps={{
+                    width: 500,
+                    height: 200,
+                    className: 'signature-canvas w-full'
+                  }}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={clearSignature}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Clear Signature
+                </Button>
+                <Button 
+                  type="button" 
+                  size="sm"
+                  onClick={handleSignAgreement}
+                  disabled={agreementSigned}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  {agreementSigned ? 'Signed' : 'Sign Agreement'}
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -341,7 +388,7 @@ Control Number: [CONTROL NUMBER]
               htmlFor="agreement-confirmation" 
               className="font-normal"
             >
-              I confirm that I have read and agree to the Trust Agreement terms, and that all identity information I have provided is accurate and truthful.
+              I confirm that I have read and agree to the RugDox LLC User Agreement terms, and that all identity information I have provided is accurate and truthful. I understand that this is a legally binding document.
             </Label>
           </div>
           
@@ -351,7 +398,7 @@ Control Number: [CONTROL NUMBER]
               <Check className="h-4 w-4 text-green-600" />
               <AlertTitle>Agreement Signed</AlertTitle>
               <AlertDescription>
-                Your signature has been recorded. Please submit the form to finalize the Trust Agreement.
+                Your signature has been recorded. Please submit the form to finalize the User Agreement and complete your RugID registration.
               </AlertDescription>
             </Alert>
           )}

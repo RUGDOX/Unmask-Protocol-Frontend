@@ -17,10 +17,10 @@ const TrustAgreementPage = () => {
 
       <div className="container relative z-10 mx-auto py-8 px-4">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-2 text-white">Unmask Protocol Trust Agreement</h1>
+          <h1 className="text-3xl font-bold mb-2 text-white">RugDox LLC User Agreement</h1>
           <p className="text-blue-100 max-w-2xl mx-auto">
-            Please review and sign the Trust Agreement to complete your RugID registration process.
-            This binding agreement establishes your commitment to ethical practices.
+            Please review and sign the User Agreement to complete your RugID registration process.
+            This binding agreement establishes your commitment to ethical practices in the Web3 space.
           </p>
         </div>
         
@@ -30,11 +30,11 @@ const TrustAgreementPage = () => {
           <AlertDescription className="flex flex-col space-y-2 text-blue-100">
             <div className="flex items-start">
               <Shield className="h-4 w-4 mr-2 mt-0.5 text-blue-400" />
-              <span>This agreement is legally binding. By signing, you confirm your identity and accept responsibility for your project.</span>
+              <span>This agreement is legally binding. By signing, you confirm your identity and accept responsibility for your actions in the Web3 space.</span>
             </div>
             <div className="flex items-start">
               <UserCheck className="h-4 w-4 mr-2 mt-0.5 text-blue-400" />
-              <span>Your verified information will be attached to this agreement as a record of your identity verification.</span>
+              <span>Your verified information will be securely stored and only accessed in the event of fraudulent activity as outlined in the agreement.</span>
             </div>
           </AlertDescription>
         </Alert>
