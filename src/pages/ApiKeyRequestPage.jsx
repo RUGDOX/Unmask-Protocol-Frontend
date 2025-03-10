@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -285,10 +284,10 @@ const ApiKeyRequestPage = () => {
                       <SelectValue placeholder="Select usage volume" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low (< 1,000 requests/day)</SelectItem>
+                      <SelectItem value="low">Low (&lt; 1,000 requests/day)</SelectItem>
                       <SelectItem value="medium">Medium (1,000 - 10,000 requests/day)</SelectItem>
                       <SelectItem value="high">High (10,000 - 100,000 requests/day)</SelectItem>
-                      <SelectItem value="veryHigh">Very High (> 100,000 requests/day)</SelectItem>
+                      <SelectItem value="veryHigh">Very High (&gt; 100,000 requests/day)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
