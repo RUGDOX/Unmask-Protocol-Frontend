@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
@@ -10,7 +11,9 @@ import {
   Fingerprint, 
   Shield, 
   Lock,
-  FilePenLine
+  FilePenLine,
+  CreditCard,
+  DollarSign
 } from "lucide-react";
 import { 
   Card, 
@@ -27,12 +30,15 @@ import { Textarea } from "./ui/textarea";
 import { projectsService } from "../services/projectsService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Separator } from "./ui/separator";
 
 const ProjectRegistrationForm = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isEligible, setIsEligible] = useState(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [rugId, setRugId] = useState(null);
   const [formData, setFormData] = useState({
     // Project Details
@@ -45,6 +51,12 @@ const ProjectRegistrationForm = () => {
     ownerName: "",
     ownerEmail: "",
     ownerWallet: "",
+    // Payment Details
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvc: "",
+    billingAddress: "",
+    billingZip: "",
     // ID Verification
     idType: "passport", // Default value
     idNumber: "",
@@ -95,7 +107,42 @@ const ProjectRegistrationForm = () => {
     }
   };
 
+  const processPayment = async () => {
+    // Validate payment fields
+    if (!formData.cardNumber || !formData.cardExpiry || !formData.cardCvc) {
+      toast.error("Please complete all payment fields");
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Successful payment simulation
+      setPaymentCompleted(true);
+      toast.success("Payment processed successfully", {
+        description: "Your identity verification fee has been processed"
+      });
+      
+      // Move to identity verification step
+      setCurrentStep(4);
+    } catch (error) {
+      toast.error("Payment processing failed", {
+        description: error.message || "Please check your payment details and try again"
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   const handleVerifyIdentity = async () => {
+    if (!paymentCompleted) {
+      toast.error("Payment must be completed before identity verification");
+      return;
+    }
+    
     if (!formData.idNumber || !formData.idImage || !formData.proofOfAddress) {
       toast.error("Please complete all identity verification fields");
       return;
@@ -203,6 +250,11 @@ const ProjectRegistrationForm = () => {
             ownerName: "",
             ownerEmail: "",
             ownerWallet: "",
+            cardNumber: "",
+            cardExpiry: "",
+            cardCvc: "",
+            billingAddress: "",
+            billingZip: "",
             idType: "passport",
             idNumber: "",
             idImage: null,
@@ -228,7 +280,7 @@ const ProjectRegistrationForm = () => {
   };
 
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -252,10 +304,11 @@ const ProjectRegistrationForm = () => {
       </CardHeader>
       <CardContent className="pt-6">
         <Tabs value={`step-${currentStep}`} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="step-1" disabled={currentStep !== 1}>Project Details</TabsTrigger>
             <TabsTrigger value="step-2" disabled={currentStep !== 2}>Owner Information</TabsTrigger>
-            <TabsTrigger value="step-3" disabled={currentStep !== 3}>Identity Verification</TabsTrigger>
+            <TabsTrigger value="step-3" disabled={currentStep !== 3}>Payment</TabsTrigger>
+            <TabsTrigger value="step-4" disabled={currentStep !== 4}>Identity Verification</TabsTrigger>
           </TabsList>
 
           <form onSubmit={handleSubmit}>
@@ -399,196 +452,353 @@ const ProjectRegistrationForm = () => {
 
             <TabsContent value="step-3" className="space-y-4 mt-4">
               <Alert>
-                <Shield className="h-4 w-4" />
-                <AlertTitle>Identity Verification Required</AlertTitle>
+                <DollarSign className="h-4 w-4" />
+                <AlertTitle>Identity Verification Fee</AlertTitle>
                 <AlertDescription>
-                  To prevent fraud and protect the Unmask Protocol ecosystem, all project owners must complete identity verification.
-                  Your data is secured in private vaults with dead man's switch protection.
+                  A one-time fee of $49.99 is required to cover the costs of identity verification and secure data storage.
+                  This fee is non-refundable and helps maintain the integrity of the RugID ecosystem.
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
-                <Label htmlFor="idType">
-                  ID Type <span className="text-red-500">*</span>
+                <Label htmlFor="cardNumber">
+                  Card Number <span className="text-red-500">*</span>
                 </Label>
-                <select
-                  id="idType"
-                  name="idType"
-                  value={formData.idType}
+                <Input
+                  id="cardNumber"
+                  name="cardNumber"
+                  value={formData.cardNumber}
                   onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  placeholder="4242 4242 4242 4242"
                   required
-                >
-                  <option value="passport">Passport</option>
-                  <option value="driverLicense">Driver's License</option>
-                  <option value="nationalId">National ID Card</option>
-                </select>
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cardExpiry">
+                    Expiration Date <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="cardExpiry"
+                    name="cardExpiry"
+                    value={formData.cardExpiry}
+                    onChange={handleChange}
+                    placeholder="MM/YY"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cardCvc">
+                    CVC <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="cardCvc"
+                    name="cardCvc"
+                    value={formData.cardCvc}
+                    onChange={handleChange}
+                    placeholder="123"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="idNumber">
-                  ID Number <span className="text-red-500">*</span>
+                <Label htmlFor="billingAddress">
+                  Billing Address <span className="text-red-500">*</span>
                 </Label>
                 <Input
-                  id="idNumber"
-                  name="idNumber"
-                  value={formData.idNumber}
+                  id="billingAddress"
+                  name="billingAddress"
+                  value={formData.billingAddress}
                   onChange={handleChange}
-                  placeholder="Enter your ID number"
+                  placeholder="123 Street Name, City"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="idImage">
-                  Upload ID Document <span className="text-red-500">*</span>
+                <Label htmlFor="billingZip">
+                  Zip/Postal Code <span className="text-red-500">*</span>
                 </Label>
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-6 flex flex-col items-center justify-center">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-center text-muted-foreground mb-2">
-                    Drag & drop or click to upload your ID document
-                  </p>
-                  <Input
-                    id="idImage"
-                    name="idImage"
-                    type="file"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => document.getElementById('idImage').click()}
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Select File
-                  </Button>
-                  {formData.idImage && (
-                    <p className="text-xs text-green-600 mt-2">
-                      <CheckCircle2 className="inline-block h-3 w-3 mr-1" />
-                      {formData.idImage.name}
-                    </p>
-                  )}
-                </div>
+                <Input
+                  id="billingZip"
+                  name="billingZip"
+                  value={formData.billingZip}
+                  onChange={handleChange}
+                  placeholder="12345"
+                  required
+                />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="proofOfAddress">
-                  Proof of Address <span className="text-red-500">*</span>
-                </Label>
-                <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-6 flex flex-col items-center justify-center">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <p className="text-sm text-center text-muted-foreground mb-2">
-                    Upload a utility bill or bank statement (less than 3 months old)
-                  </p>
-                  <Input
-                    id="proofOfAddress"
-                    name="proofOfAddress"
-                    type="file"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => document.getElementById('proofOfAddress').click()}
-                  >
-                    <FileText className="mr-2 h-4 w-4" />
-                    Select File
-                  </Button>
-                  {formData.proofOfAddress && (
-                    <p className="text-xs text-green-600 mt-2">
-                      <CheckCircle2 className="inline-block h-3 w-3 mr-1" />
-                      {formData.proofOfAddress.name}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <Separator className="my-4" />
 
-              <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-start space-x-2">
-                  <input
-                    type="checkbox"
-                    id="dataVaultConsent"
-                    name="dataVaultConsent"
-                    checked={formData.dataVaultConsent}
-                    onChange={(e) => 
-                      setFormData({...formData, dataVaultConsent: e.target.checked})
-                    }
-                    className="mt-1"
-                    required
-                  />
-                  <Label htmlFor="dataVaultConsent" className="font-normal">
-                    I consent to storing my personal information in Unmask Protocol's secure data vault with dead man's switch protection. My information will only be used for verification purposes and will never be shared without explicit legal requirements.
-                  </Label>
-                </div>
+              <div className="flex items-center justify-between">
+                <div className="font-medium">Total:</div>
+                <div className="text-lg font-bold">$49.99</div>
               </div>
 
               <div className="mt-6">
                 <Button
                   type="button"
                   className="w-full"
-                  variant={isEligible ? "outline" : "default"}
-                  onClick={handleVerifyIdentity}
-                  disabled={isVerifying || isEligible === true}
+                  onClick={processPayment}
+                  disabled={isProcessingPayment || paymentCompleted}
                 >
-                  {isVerifying ? (
-                    "Verifying..."
-                  ) : isEligible === true ? (
+                  {isProcessingPayment ? (
+                    "Processing..."
+                  ) : paymentCompleted ? (
                     <>
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Verified
+                      Payment Complete
                     </>
                   ) : (
-                    "Verify Identity"
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Pay $49.99
+                    </>
                   )}
                 </Button>
               </div>
 
-              {isEligible === false && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Verification Failed</AlertTitle>
+              {paymentCompleted && (
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <AlertTitle>Payment Successful</AlertTitle>
                   <AlertDescription>
-                    You are not eligible for a RugID. This may be due to an existing registration or blacklist record.
+                    Your payment has been successfully processed. You can now proceed to identity verification.
                   </AlertDescription>
                 </Alert>
               )}
-              
-              {rugId && isEligible && (
+
+              <div className="flex justify-between mt-6">
+                <Button type="button" variant="outline" onClick={prevStep}>
+                  Back
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  disabled={!paymentCompleted}
+                >
+                  Next <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="step-4" className="space-y-4 mt-4">
+              {!paymentCompleted && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Payment Required</AlertTitle>
+                  <AlertDescription>
+                    You must complete payment before proceeding with identity verification.
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => setCurrentStep(3)}
+                    >
+                      Go to Payment
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {paymentCompleted && (
                 <>
-                  <Alert className="mt-4 bg-green-50 border-green-200">
-                    <Fingerprint className="h-4 w-4" />
-                    <AlertTitle>RugID Generated</AlertTitle>
-                    <AlertDescription className="font-mono">
-                      Your unique RugID: {rugId}
-                    </AlertDescription>
-                    <p className="text-xs mt-1 text-muted-foreground">
-                      This ID is unique to you and cannot be reverse-engineered to reveal your personal information.
-                    </p>
-                  </Alert>
-                  
-                  <Alert className="mt-4">
-                    <FilePenLine className="h-4 w-4" />
-                    <AlertTitle>Trust Agreement Required</AlertTitle>
+                  <Alert>
+                    <Shield className="h-4 w-4" />
+                    <AlertTitle>Identity Verification Required</AlertTitle>
                     <AlertDescription>
-                      To complete your RugID registration, you must review and sign the Trust Agreement.
-                      <div className="mt-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          asChild
-                        >
-                          <Link to="/trust-agreement">
-                            <FileText className="mr-2 h-4 w-4" />
-                            Proceed to Trust Agreement
-                          </Link>
-                        </Button>
-                      </div>
+                      To prevent fraud and protect the Unmask Protocol ecosystem, all project owners must complete identity verification.
+                      Your data is secured in private vaults with dead man's switch protection.
                     </AlertDescription>
                   </Alert>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="idType">
+                      ID Type <span className="text-red-500">*</span>
+                    </Label>
+                    <select
+                      id="idType"
+                      name="idType"
+                      value={formData.idType}
+                      onChange={handleChange}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      required
+                    >
+                      <option value="passport">Passport</option>
+                      <option value="driverLicense">Driver's License</option>
+                      <option value="nationalId">National ID Card</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="idNumber">
+                      ID Number <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="idNumber"
+                      name="idNumber"
+                      value={formData.idNumber}
+                      onChange={handleChange}
+                      placeholder="Enter your ID number"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="idImage">
+                      Upload ID Document <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-6 flex flex-col items-center justify-center">
+                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-center text-muted-foreground mb-2">
+                        Drag & drop or click to upload your ID document
+                      </p>
+                      <Input
+                        id="idImage"
+                        name="idImage"
+                        type="file"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('idImage').click()}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        Select File
+                      </Button>
+                      {formData.idImage && (
+                        <p className="text-xs text-green-600 mt-2">
+                          <CheckCircle2 className="inline-block h-3 w-3 mr-1" />
+                          {formData.idImage.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="proofOfAddress">
+                      Proof of Address <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-md p-6 flex flex-col items-center justify-center">
+                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                      <p className="text-sm text-center text-muted-foreground mb-2">
+                        Upload a utility bill or bank statement (less than 3 months old)
+                      </p>
+                      <Input
+                        id="proofOfAddress"
+                        name="proofOfAddress"
+                        type="file"
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('proofOfAddress').click()}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        Select File
+                      </Button>
+                      {formData.proofOfAddress && (
+                        <p className="text-xs text-green-600 mt-2">
+                          <CheckCircle2 className="inline-block h-3 w-3 mr-1" />
+                          {formData.proofOfAddress.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        id="dataVaultConsent"
+                        name="dataVaultConsent"
+                        checked={formData.dataVaultConsent}
+                        onChange={(e) => 
+                          setFormData({...formData, dataVaultConsent: e.target.checked})
+                        }
+                        className="mt-1"
+                        required
+                      />
+                      <Label htmlFor="dataVaultConsent" className="font-normal">
+                        I consent to storing my personal information in Unmask Protocol's secure data vault with dead man's switch protection. My information will only be used for verification purposes and will never be shared without explicit legal requirements.
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <Button
+                      type="button"
+                      className="w-full"
+                      variant={isEligible ? "outline" : "default"}
+                      onClick={handleVerifyIdentity}
+                      disabled={isVerifying || isEligible === true}
+                    >
+                      {isVerifying ? (
+                        "Verifying..."
+                      ) : isEligible === true ? (
+                        <>
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
+                          Verified
+                        </>
+                      ) : (
+                        "Verify Identity"
+                      )}
+                    </Button>
+                  </div>
+
+                  {isEligible === false && (
+                    <Alert variant="destructive" className="mt-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Verification Failed</AlertTitle>
+                      <AlertDescription>
+                        You are not eligible for a RugID. This may be due to an existing registration or blacklist record.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {rugId && isEligible && (
+                    <>
+                      <Alert className="mt-4 bg-green-50 border-green-200">
+                        <Fingerprint className="h-4 w-4" />
+                        <AlertTitle>RugID Generated</AlertTitle>
+                        <AlertDescription className="font-mono">
+                          Your unique RugID: {rugId}
+                        </AlertDescription>
+                        <p className="text-xs mt-1 text-muted-foreground">
+                          This ID is unique to you and cannot be reverse-engineered to reveal your personal information.
+                        </p>
+                      </Alert>
+                      
+                      <Alert className="mt-4">
+                        <FilePenLine className="h-4 w-4" />
+                        <AlertTitle>Trust Agreement Required</AlertTitle>
+                        <AlertDescription>
+                          To complete your RugID registration, you must review and sign the Trust Agreement.
+                          <div className="mt-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              asChild
+                            >
+                              <Link to="/trust-agreement">
+                                <FileText className="mr-2 h-4 w-4" />
+                                Proceed to Trust Agreement
+                              </Link>
+                            </Button>
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    </>
+                  )}
                 </>
               )}
 

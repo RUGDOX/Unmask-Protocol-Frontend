@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import SignatureCanvas from 'react-signature-canvas';
 import { 
@@ -34,6 +34,7 @@ import { Input } from "./ui/input";
 
 const TrustAgreementForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [hasRead, setHasRead] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [controlNumber, setControlNumber] = useState('');
@@ -76,6 +77,12 @@ const TrustAgreementForm = () => {
     // In a real application, you would fetch the RugID and user data here
     // For demo purposes, we'll set a sample RugID
     setRugId('RID-AB12CD34EF56');
+    
+    // In a real app, we would get the RugID from URL parameters or state
+    // Example: const { rugId } = useParams();
+    // or
+    // const { state } = useLocation();
+    // if (state && state.rugId) setRugId(state.rugId);
     
     // Simulating loading user data from previous verification
     // In a real app, this would come from context, params, or an API
@@ -408,7 +415,7 @@ Date: ${new Date().toLocaleDateString()}
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/register')}
           >
             Cancel
           </Button>
