@@ -48,7 +48,6 @@ const ApiKeyRequestPage = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -63,7 +62,6 @@ const ApiKeyRequestPage = () => {
       [name]: value
     }));
     
-    // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -126,7 +124,6 @@ const ApiKeyRequestPage = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API request
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast.success('API key request submitted successfully!');
@@ -284,10 +281,10 @@ const ApiKeyRequestPage = () => {
                       <SelectValue placeholder="Select usage volume" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low (&lt; 1,000 requests/day)</SelectItem>
+                      <SelectItem value="low">Low (less than 1,000 requests/day)</SelectItem>
                       <SelectItem value="medium">Medium (1,000 - 10,000 requests/day)</SelectItem>
                       <SelectItem value="high">High (10,000 - 100,000 requests/day)</SelectItem>
-                      <SelectItem value="veryHigh">Very High (&gt; 100,000 requests/day)</SelectItem>
+                      <SelectItem value="veryHigh">Very High (more than 100,000 requests/day)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
