@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import SignatureCanvas from 'react-signature-canvas';
@@ -14,7 +14,8 @@ import {
   Shield, 
   UserCheck,
   Calendar,
-  Info
+  Info,
+  IdCard
 } from 'lucide-react';
 import { 
   Card, 
@@ -31,6 +32,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 import { Separator } from "./ui/separator";
 import { Input } from "./ui/input";
+import { Badge } from "./ui/badge";
 
 const TrustAgreementForm = () => {
   const navigate = useNavigate();
@@ -38,21 +40,23 @@ const TrustAgreementForm = () => {
   const [hasRead, setHasRead] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [controlNumber, setControlNumber] = useState('');
-  const [rugId, setRugId] = useState(''); // This would come from the previous verification process
+  const [rugId, setRugId] = useState(''); 
   const [agreementSigned, setAgreementSigned] = useState(false);
   const [userIdentityInfo, setUserIdentityInfo] = useState({
-    fullName: 'John Doe', // This would be populated from the verification data
-    idType: 'Passport',
-    idNumber: 'P123456789',
-    address: '123 Blockchain St, Crypto City, CC 12345',
-    isOver18: true,
-    verificationId: 'ID-V-7891011',
-    authCode: 'AUTH-123456'
+    fullName: '',
+    idType: '',
+    idNumber: '',
+    address: '',
+    isOver18: false,
+    verificationId: '',
+    authCode: '',
+    verificationDate: ''
   });
   
   // For name input in the signature section
   const [nameInput, setNameInput] = useState('');
   const [signatureName, setSignatureName] = useState('');
+  const [signatureDate, setSignatureDate] = useState('');
 
   // Signature pad reference
   const signaturePad = useRef(null);
@@ -66,31 +70,48 @@ const TrustAgreementForm = () => {
 
   // Truncate long text
   const truncateText = (text, length) => {
+    if (!text) return '';
     return text.length > length ? text.substring(0, length) + "..." : text;
   };
 
   // Initialize component
-  React.useEffect(() => {
+  useEffect(() => {
     // Generate control number when component mounts
     setControlNumber(generateControlNumber());
     
-    // In a real application, you would fetch the RugID and user data here
-    // For demo purposes, we'll set a sample RugID
-    setRugId('RID-AB12CD34EF56');
+    // In a real application, we would fetch identity data from previous steps
+    // For now, we'll simulate this data
     
-    // In a real app, we would get the RugID from URL parameters or state
-    // Example: const { rugId } = useParams();
-    // or
-    // const { state } = useLocation();
-    // if (state && state.rugId) setRugId(state.rugId);
+    // Fetch identity verification data from location state (or API in a real app)
+    if (location.state && location.state.identityData) {
+      setUserIdentityInfo(location.state.identityData);
+    } else {
+      // Fallback mock data for demonstration
+      setUserIdentityInfo({
+        fullName: 'John Doe',
+        idType: 'Passport',
+        idNumber: 'P123456789',
+        address: '123 Blockchain St, Crypto City, CC 12345',
+        isOver18: true,
+        verificationId: 'ID-V-7891011',
+        authCode: 'AUTH-123456',
+        verificationDate: new Date().toLocaleDateString()
+      });
+    }
     
-    // Simulating loading user data from previous verification
-    // In a real app, this would come from context, params, or an API
-  }, []);
+    // Get RugID from location state if available
+    if (location.state && location.state.rugId) {
+      setRugId(location.state.rugId);
+    } else {
+      // Fallback mock RugID for demonstration
+      setRugId('RID-AB12CD34EF56');
+    }
+  }, [location]);
 
   const clearSignature = () => {
     signaturePad.current.clear();
     setAgreementSigned(false);
+    setSignatureName('');
   };
 
   const handleSignAgreement = () => {
@@ -100,11 +121,12 @@ const TrustAgreementForm = () => {
     }
     
     if (!nameInput.trim()) {
-      toast.error('Please enter your full name for the signature');
+      toast.error('Please enter your full legal name for the signature');
       return;
     }
     
     setSignatureName(nameInput);
+    setSignatureDate(new Date().toLocaleDateString());
     setAgreementSigned(true);
     toast.success('Agreement successfully signed!');
   };
@@ -152,7 +174,7 @@ const TrustAgreementForm = () => {
     toast.info('This would download the agreement as a PDF in a production environment');
   };
 
-  // The updated trust agreement text
+  // The updated trust agreement text with placeholders for variables
   const trustAgreementText = `
 **RugDox LLC User Agreement**
 
@@ -239,7 +261,7 @@ By: ${signatureName || '_________________________'}
 Name: ${signatureName || '_________________________'}
 18+: ${userIdentityInfo.isOver18 ? 'Yes' : 'No'}
 RugID: ${rugId}
-Date: ${new Date().toLocaleDateString()}
+Date: ${signatureDate || '_________________________'}
 `;
 
   return (
@@ -256,6 +278,50 @@ Date: ${new Date().toLocaleDateString()}
       
       <form onSubmit={handleSubmit}>
         <CardContent className="pt-6 space-y-6">
+          {/* Identity Verification Data Box */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <IdCard className="h-5 w-5 text-primary" />
+              <Label className="text-lg">Identity Verification Record</Label>
+              <Badge variant="outline" className="ml-auto">Verified</Badge>
+            </div>
+            <div className="border p-4 rounded-md bg-muted/20">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium">Full Legal Name:</p>
+                  <p className="text-sm">{userIdentityInfo.fullName}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">ID Type:</p>
+                  <p className="text-sm">{userIdentityInfo.idType}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">ID Number:</p>
+                  <p className="text-sm">{truncateText(userIdentityInfo.idNumber, 5)}***</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Verified Address:</p>
+                  <p className="text-sm">{truncateText(userIdentityInfo.address, 20)}</p>
+                </div>
+              </div>
+              <Separator className="my-3" />
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-mono">ID-V: {userIdentityInfo.verificationId}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Verified on: {userIdentityInfo.verificationDate}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-mono">Auth: {userIdentityInfo.authCode}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Agreement Text Display */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
@@ -281,25 +347,17 @@ Date: ${new Date().toLocaleDateString()}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Info className="h-5 w-5 text-primary" />
-              <Label className="text-lg">Verified Identity Information</Label>
+              <Label className="text-lg">Agreement Information</Label>
             </div>
             <div className="border p-4 rounded-md bg-muted/20">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium">Full Name:</p>
-                  <p className="text-sm">{userIdentityInfo.fullName}</p>
+                  <p className="text-sm font-medium">Agreement Date:</p>
+                  <p className="text-sm">{new Date().toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium">ID Type:</p>
-                  <p className="text-sm">{userIdentityInfo.idType}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">ID Number:</p>
-                  <p className="text-sm">{truncateText(userIdentityInfo.idNumber, 5)}***</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Address:</p>
-                  <p className="text-sm">{truncateText(userIdentityInfo.address, 20)}</p>
+                  <p className="text-sm font-medium">18+ Verification:</p>
+                  <p className="text-sm">{userIdentityInfo.isOver18 ? 'Yes' : 'No'}</p>
                 </div>
               </div>
               <Separator className="my-3" />
@@ -315,17 +373,6 @@ Date: ${new Date().toLocaleDateString()}
                 <div className="flex items-center gap-2">
                   <Lock className="h-4 w-4 text-primary" />
                   <span className="text-sm font-mono">Control #: {controlNumber}</span>
-                </div>
-              </div>
-              <Separator className="my-3" />
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-mono">ID-V: {userIdentityInfo.verificationId}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-mono">Auth: {userIdentityInfo.authCode}</span>
                 </div>
               </div>
             </div>
@@ -348,6 +395,9 @@ Date: ${new Date().toLocaleDateString()}
                   placeholder="Enter your full legal name"
                   className="max-w-md"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Please enter your name exactly as it appears on your legal ID
+                </p>
               </div>
               
               <div className="border rounded-md bg-white p-1">
@@ -383,6 +433,34 @@ Date: ${new Date().toLocaleDateString()}
               </div>
             </div>
           </div>
+          
+          {/* Final Agreement Details - shown when signed */}
+          {agreementSigned && (
+            <div className="border-t pt-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-green-500" />
+                <Label className="text-lg">Signed Agreement Details</Label>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium">Signatory Name:</p>
+                  <p className="text-sm">{signatureName}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Signature Date:</p>
+                  <p className="text-sm">{signatureDate}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">RugID:</p>
+                  <p className="text-sm font-mono">{rugId}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Agreement Control Number:</p>
+                  <p className="text-sm font-mono">{controlNumber}</p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Confirmation Checkbox */}
           <div className="flex items-start space-x-2 pt-4 border-t">
