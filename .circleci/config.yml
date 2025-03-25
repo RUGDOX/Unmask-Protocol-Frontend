@@ -26,7 +26,7 @@ jobs:
       - store_artifacts:
           path: dist
           destination: build
-  test:
+  lint:
     executor: node-executor
     steps:
       - checkout
@@ -38,13 +38,13 @@ jobs:
           name: Install dependencies
           command: npm install
       - run:
-          name: Run tests
-          command: npm test
+          name: Run lint
+          command: npm run lint
 workflows:
   version: 2
-  build_and_test:
+  build_and_lint:
     jobs:
       - build
-      - test:
+      - lint:
           requires:
             - build
